@@ -119,6 +119,31 @@
     margin-top: 14px;
   }
 
+  .name-input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1.5px solid rgba(255,255,255,0.15);
+    color: var(--white);
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Noto Sans JP', sans-serif;
+    margin-top: 14px;
+  }
+  .name-input::placeholder { color: var(--gray); }
+  .name-input:focus { outline: none; border-color: var(--gold); }
+
+  .referred-badge {
+    margin-top: 16px;
+    background: rgba(197,160,101,0.12);
+    border: 1px solid rgba(197,160,101,0.4);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 12.5px;
+    color: var(--gold-light);
+    text-align: center;
+  }
+
   /* ===== QUIZ ===== */
   .progress-track {
     height: 4px;
@@ -303,6 +328,62 @@
     text-decoration: underline;
     cursor: pointer;
   }
+
+  /* ===== REFERRAL CARD ===== */
+  .referral-card {
+    background: linear-gradient(135deg, rgba(197,160,101,0.1), rgba(249,115,22,0.06));
+    border: 1.5px solid rgba(197,160,101,0.35);
+    border-radius: 16px;
+    padding: 22px 20px;
+    margin-top: 20px;
+  }
+  .referral-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 16.5px;
+    font-weight: 900;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .referral-steps { margin-bottom: 18px; }
+  .referral-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: #DCE1EC;
+    padding: 8px 0;
+  }
+  .referral-num {
+    flex-shrink: 0;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: var(--navy-deep);
+    font-weight: 900;
+    font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn-copy {
+    width: 100%;
+    background: rgba(255,255,255,0.08);
+    border: 1.5px solid var(--gold);
+    color: var(--gold-light);
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 700;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn-copy:active { background: rgba(197,160,101,0.2); }
+  .referral-note {
+    font-size: 11px;
+    color: var(--gray);
+    line-height: 1.7;
+    margin-top: 12px;
+    text-align: center;
+  }
 </style>
 </head>
 <body>
@@ -318,7 +399,9 @@
     <p class="hero-desc">同じ商品、同じトーク、同じ努力量。なのに売れる人と売れない人がいるのはなぜか。答えは「タイプに合わない戦い方」をしているからです。DiSC理論×アマサイ理論をかけ合わせた、Trust-Builder AIと同じロジックで、あなたの強みと伸びしろを1分で診断します。</p>
 
     <button class="btn-primary" onclick="startQuiz()">1分で自分のタイプを知る →</button>
+    <input type="text" id="userName" class="name-input" placeholder="お名前（紹介リンク作成用・任意）">
     <p class="meta-note">脳内Hack Sales 主宰・脇真央 監修 ／ すでに1,000名以上のクライアントを分析した実践データがベース</p>
+    <div class="referred-badge" id="referredBadge" style="display:none;"></div>
   </div>
 
   <!-- ================= QUIZ ================= -->
@@ -371,6 +454,22 @@
 
     <p class="share-hint">この診断、<b>あなたの周りの「頑張ってるのに結果が出ない人」</b>にも刺さります。<br>友達を紹介すると、詳細診断とビジネス書要約リストが解放されます。</p>
 
+    <div class="referral-card">
+      <div class="referral-title">🎁 紹介するほど、あなたが得する</div>
+      <div class="referral-steps">
+        <div class="referral-step">
+          <span class="referral-num">1</span>
+          <span><b>1人紹介</b> → 詳細診断＋改善アドバイスが解放</span>
+        </div>
+        <div class="referral-step">
+          <span class="referral-num">3</span>
+          <span><b>3人紹介</b> → ビジネス書要約100冊分が解放</span>
+        </div>
+      </div>
+      <button class="btn-copy" onclick="copyReferralLink()">あなた専用の紹介リンクをコピー</button>
+      <div class="referral-note" id="referralNote">コピーしたリンクを友達に送るだけ。友達が診断を受けたら、LINEで「〇〇さんの紹介です」と伝えてもらってください。</div>
+    </div>
+
     <span class="restart-link" onclick="location.reload()">もう一度診断する</span>
   </div>
 
@@ -381,6 +480,35 @@
 // 真央さんの公式LINEのURLをここに入れてください
 const LINE_URL = "https://s.lmes.jp/landing-qr/1657797570-2Dj9r0mz?uLand=JMkz4b";
 document.getElementById('lineBtn').href = LINE_URL;
+
+// ==================== REFERRAL DETECTION ====================
+// URLに ?ref=名前 が付いていたら「紹介経由」として表示
+const urlParams = new URLSearchParams(window.location.search);
+const referrerName = urlParams.get('ref');
+if (referrerName) {
+  const badge = document.getElementById('referredBadge');
+  badge.style.display = 'block';
+  badge.textContent = `${decodeURIComponent(referrerName)}さんの紹介で来られたんですね！`;
+}
+
+function copyReferralLink() {
+  const myName = document.getElementById('userName') ? document.getElementById('userName').value.trim() : '';
+  const baseUrl = window.location.origin + window.location.pathname;
+  const link = myName
+    ? `${baseUrl}?ref=${encodeURIComponent(myName)}`
+    : baseUrl;
+
+  navigator.clipboard.writeText(link).then(() => {
+    const note = document.getElementById('referralNote');
+    if (myName) {
+      note.textContent = 'リンクをコピーしました！友達に送ってください。友達が診断を受けたら、LINEで「○○さんの紹介です」と伝えてもらうのを忘れずに。';
+    } else {
+      note.textContent = 'リンクをコピーしました！ただし、最初の画面で「お名前」を入力してから診断すると、あなた専用のリンクになります。';
+    }
+  }).catch(() => {
+    alert('コピーできませんでした。お手数ですが、URLを手動でコピーしてください。');
+  });
+}
 
 // ==================== QUESTIONS ====================
 // 各選択肢に DiSC(D/i/S/C) と アマサイ(能動/管理/奉仕/革新) のスコアを付与
