@@ -390,6 +390,13 @@
 
 <div class="bg-glow"></div>
 
+<!-- 診断の完了数・LINEタップ数を数えるための非表示フォーム（Netlify Forms）。個人情報は送らない -->
+<form name="diag-event" method="POST" data-netlify="true" hidden>
+  <input type="text" name="event">
+  <input type="text" name="type">
+  <input type="text" name="ref">
+</form>
+
 <div class="container">
 
   <!-- ================= INTRO ================= -->
@@ -441,13 +448,13 @@
 
     <div class="lock-card">
       <div class="lock-icon">🔒</div>
-      <div class="lock-title">この結果を知らずに営業を続けるのは、<br>正直、もったいない。</div>
-      <div class="lock-desc">あなたのタイプ別「攻略法」と、書籍30冊以上の要約＋実践タスクを、公式LINEでプレゼントします。</div>
-      <a href="#" class="btn-line" id="lineBtn" target="_blank">友だち追加して特典を受け取る</a>
+      <div class="lock-title">結果は、ここまで。<br>続きは、LINEで渡します。</div>
+      <div class="lock-desc">あなたのタイプ専用の「攻略法」を、公式LINEでお届けします。無料です。</div>
+      <a href="#" class="btn-line" id="lineBtn" target="_blank">攻略法をLINEで受け取る</a>
       <div class="lock-steps">
-        <b>①</b> 上のボタンから公式LINEを友だち追加<br>
-        <b>②</b> この結果画面の「○○型」を確認する<br>
-        <b>③</b> トーク画面に「○○型」をそのまま送信<br>
+        <b>①</b> 上のボタンを押す（<span id="stepTypeCopy">あなたのタイプ名</span>を自動でコピーします）<br>
+        <b>②</b> 公式LINEを友だち追加<br>
+        <b>③</b> トーク画面に貼り付けて送信（コピーできなかったら、<span id="stepTypeInput">あなたのタイプ名</span>と入力）<br>
         <b>④</b> あなた専用の攻略法が届きます
       </div>
     </div>
@@ -480,6 +487,26 @@
 // 真央さんの公式LINEのURLをここに入れてください
 const LINE_URL = "https://s.lmes.jp/landing-qr/1657797570-2Dj9r0mz?uLand=tdJr5c";
 document.getElementById('lineBtn').href = LINE_URL;
+
+// ==================== EVENT LOG (Netlify Forms) ====================
+// 診断の「完了」と「LINEボタンのタップ」だけを数える。個人情報・名前は送らない。
+function track(eventName, typeName) {
+  try {
+    const body = new URLSearchParams({
+      'form-name': 'diag-event',
+      event: eventName,
+      type: typeName || '',
+      ref: referrerName ? 'ref' : ''
+    });
+    fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString(),
+      keepalive: true
+    }).catch(() => {});
+  } catch (e) {}
+}
+let currentResultName = '';
 
 // ==================== REFERRAL DETECTION ====================
 // URLに ?ref=名前 が付いていたら「紹介経由」として表示
@@ -662,8 +689,24 @@ function showResult() {
   document.getElementById('resultStrength').innerHTML = result.strength;
   document.getElementById('resultWeakness').innerHTML = result.weakness;
 
+  currentResultName = result.title;
+  document.getElementById('lineBtn').textContent = `「${result.title}」の攻略法を受け取る`;
+  document.getElementById('stepTypeCopy').textContent = `「${result.title}」`;
+  document.getElementById('stepTypeInput').textContent = `「${result.title}」`;
+
   showScreen('screen-result');
+  track('complete', result.title);
 }
+
+document.getElementById('lineBtn').addEventListener('click', function () {
+  // 結果の型名をコピーしておく（LINEのトークに貼り付けるだけで攻略法が届く）
+  try {
+    if (navigator.clipboard && currentResultName) {
+      navigator.clipboard.writeText(currentResultName).catch(() => {});
+    }
+  } catch (e) {}
+  track('line_tap', currentResultName);
+});
 </script>
 
 </body>
