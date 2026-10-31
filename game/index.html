@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#F4F0E8">
+<title>お客さんの"段"、読めますか。 | 脳内Hack Sales</title>
+<meta name="description" content="お客さんのひとことから、いま何段目にいるかを当てる90秒のゲーム。営業って、実は読み合い。">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@600;900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+
+  :root {
+    --paper: #F4F0E8;
+    --paper-2: #FBF9F4;
+    --ink: #1D1D1B;
+    --sub: #6B665C;
+    --rule: #D9D2C3;
+    --accent: #D0391E;
+    --ok: #1F7A4D;
+    --line-green: #06C755;
+    --serif: 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+    --sans: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { background: var(--paper); }
+  body { font-family: var(--sans); background: var(--paper); color: var(--ink); min-height: 100vh; overflow-x: hidden; -webkit-user-select: none; user-select: none; line-height: 1.7; }
+  .container { max-width: 520px; margin: 0 auto; padding: 22px 20px 48px; min-height: 100vh; }
+
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadeIn .3s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* ===== TITLE ===== */
+  .head { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid var(--ink); padding-bottom: 12px; margin-bottom: 22px; }
+  .brand { font-size: 12px; font-weight: 700; letter-spacing: .12em; }
+  .meta { font-size: 12px; color: var(--sub); margin-top: 2px; }
+  .stair-mark { width: 54px; height: 40px; flex: 0 0 54px; }
+  .from-badge { display: none; margin-bottom: 18px; padding: 10px 12px; font-size: 13px; line-height: 1.7; border-left: 3px solid var(--accent); background: var(--paper-2); }
+  h1 { font-family: var(--serif); font-weight: 900; font-size: 32px; line-height: 1.45; margin-bottom: 6px; letter-spacing: .01em; }
+  .lead { font-family: var(--serif); font-weight: 600; font-size: 18px; margin-bottom: 18px; color: var(--accent); }
+  .desc b { font-weight: 900; color: var(--ink); }
+  .desc { font-size: 14.5px; color: #3A372F; line-height: 1.9; margin-bottom: 20px; }
+
+  .legend-title { font-size: 12px; font-weight: 700; color: var(--sub); letter-spacing: .06em; margin-bottom: 8px; }
+  .legend { margin-bottom: 22px; border-top: 1px solid var(--rule); }
+  .legend > div { display: grid; grid-template-columns: 56px 1fr; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--rule); }
+  .legend b { font-family: var(--serif); font-weight: 900; font-size: 15px; }
+  .legend em { font-style: normal; font-weight: 900; font-size: 15px; margin-right: 8px; }
+  .legend span { font-size: 12.5px; color: var(--sub); }
+  .legend .ex { display: block; margin-top: 3px; font-family: var(--serif); font-weight: 600; font-size: 13.5px; color: #3A372F; }
+
+  .btn { display: block; width: 100%; padding: 17px; font-family: var(--sans); font-size: 16px; font-weight: 700; letter-spacing: .06em; text-align: center; text-decoration: none; cursor: pointer; border-radius: 6px; border: 2px solid var(--ink); background: var(--ink); color: #fff; transition: transform .06s; }
+  .btn:active { transform: translateY(2px); }
+  .btn.accent { background: var(--accent); border-color: var(--accent); }
+  .btn.ghost { background: transparent; color: var(--ink); margin-top: 10px; font-weight: 500; font-size: 14.5px; padding: 14px; }
+  .btn.line { background: var(--line-green); border-color: var(--line-green); }
+  .note { font-size: 12px; color: var(--sub); text-align: center; margin-top: 14px; line-height: 1.8; }
+
+  /* ===== PLAY ===== */
+  .bar { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; }
+  .qno { font-family: var(--serif); font-weight: 900; font-size: 18px; }
+  .qno small { font-family: var(--sans); font-weight: 500; font-size: 13px; color: var(--sub); }
+  .tally { font-size: 12px; color: var(--sub); display: flex; gap: 5px; align-items: center; }
+  .tally i { width: 9px; height: 9px; border: 1.5px solid var(--ink); display: inline-block; }
+  .tally i.ok { background: var(--ok); border-color: var(--ok); } .tally i.ng { background: var(--accent); border-color: var(--accent); }
+  .help { font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--ink); background: transparent; border: 1.5px solid var(--ink); border-radius: 4px; padding: 3px 10px; cursor: pointer; }
+  .badge-p { display: inline-block; background: var(--accent); color: #fff; font-family: var(--sans); font-size: 11px; font-weight: 900; padding: 2px 8px; margin-left: 8px; letter-spacing: .06em; vertical-align: 2px; }
+  .backdrop { position: fixed; inset: 0; background: rgba(29,29,27,.45); z-index: 35; opacity: 0; visibility: hidden; transition: opacity .2s, visibility 0s .2s; }
+  .backdrop.show { opacity: 1; visibility: visible; transition: opacity .2s; }
+  .help-sheet { z-index: 45; max-height: 88vh; overflow-y: auto; }
+  .timer { height: 4px; background: var(--rule); margin-bottom: 22px; }
+  .timer > div { height: 100%; width: 100%; background: var(--ink); transform-origin: left; }
+  .timer > div.low { background: var(--accent); }
+
+  .scene { font-size: 12px; color: var(--sub); font-weight: 700; letter-spacing: .04em; margin-bottom: 8px; }
+  .quote { font-family: var(--serif); font-weight: 900; font-size: 22px; line-height: 1.7; padding-left: 14px; border-left: 4px solid var(--ink); margin-bottom: 26px; animation: fadeIn .35s ease; }
+  .ask { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+
+  .stairs { display: flex; flex-direction: column; gap: 7px; }
+  .step { position: relative; display: flex; align-items: stretch; width: calc(100% - var(--ml)); margin-left: var(--ml); background: var(--paper-2); border: 2px solid var(--ink); border-radius: 6px; cursor: pointer; text-align: left; font-family: var(--sans); color: var(--ink); overflow: hidden; transition: transform .06s; }
+  .step:active { transform: translateY(2px); }
+  .step .n { flex: 0 0 46px; display: grid; place-items: center; background: var(--ink); color: #fff; font-family: var(--serif); font-weight: 900; font-size: 20px; }
+  .step .txt { padding: 9px 12px; flex: 1; }
+  .step .t { font-weight: 900; font-size: 16px; line-height: 1.3; }
+  .step .d { font-size: 12px; color: var(--sub); margin-top: 1px; line-height: 1.4; }
+  .step .tag { align-self: center; padding-right: 12px; font-size: 12px; font-weight: 900; display: none; }
+  .step.locked { pointer-events: none; }
+  .step.wait { opacity: .55; }
+  .step.dim { opacity: .35; }
+  .step.right { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .step.right .n { background: rgba(0,0,0,.25); }
+  .step.right .d { color: rgba(255,255,255,.85); }
+  .step.right .tag { display: block; }
+  .step.wrong { border-color: var(--accent); }
+  .step.wrong .n { background: var(--accent); }
+  .step.wrong .tag { display: block; color: var(--accent); }
+
+  .sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: var(--paper-2); border-top: 2px solid var(--ink); transform: translateY(105%); visibility: hidden; transition: transform .25s ease, visibility 0s .25s; }
+  .sheet.show { transform: none; visibility: visible; transition: transform .25s ease, visibility 0s; }
+  .sheet-in { max-width: 520px; margin: 0 auto; padding: 16px 20px calc(16px + env(safe-area-inset-bottom)); }
+  .verdict { font-family: var(--serif); font-weight: 900; font-size: 24px; line-height: 1.3; margin-bottom: 6px; }
+  .verdict.ok { color: var(--ok); } .verdict.near, .verdict.far { color: var(--accent); } .verdict.time { color: var(--sub); }
+  .why { font-size: 14px; line-height: 1.85; color: #3A372F; margin-bottom: 14px; }
+  .why b { font-weight: 900; color: var(--ink); }
+
+  /* ===== RESULT ===== */
+  .r-label { font-size: 12px; font-weight: 700; letter-spacing: .14em; color: var(--sub); margin: 6px 0 4px; }
+  .r-score { font-family: var(--serif); font-weight: 900; font-size: 72px; line-height: 1.1; }
+  .r-score small { font-size: 22px; font-weight: 600; margin-left: 4px; }
+  .recap { margin: 16px 0 26px; border-top: 2px solid var(--ink); }
+  .recap div { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: 13.5px; }
+  .recap .q { font-family: var(--serif); font-weight: 900; width: 30px; }
+  .recap .a { flex: 1; color: #3A372F; }
+  .recap .a b { font-weight: 900; color: var(--ink); }
+  .recap .m { font-weight: 900; width: 70px; text-align: right; }
+  .recap .m.ok { color: var(--ok); } .recap .m.ng { color: var(--accent); } .recap .m.to { color: var(--sub); }
+
+  .sec-label { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--sub); margin-bottom: 10px; }
+  .gauge { position: relative; height: 2px; background: var(--ink); margin: 18px 6px 8px; }
+  .gauge i { position: absolute; top: -4px; width: 2px; height: 10px; background: var(--ink); }
+  .gauge .pin { position: absolute; top: 50%; left: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px; background: var(--accent); border: 2px solid var(--paper); outline: 2px solid var(--accent); transition: left 1s cubic-bezier(.3,1,.4,1); }
+  .gauge-lbl { display: flex; justify-content: space-between; font-size: 12px; color: var(--sub); margin: 0 0 18px; }
+  .gauge-lbl b { color: var(--ink); }
+  .res-h { font-family: var(--serif); font-weight: 900; font-size: 22px; line-height: 1.55; margin-bottom: 8px; }
+  .res-p { font-size: 14.5px; line-height: 1.95; color: #3A372F; }
+  .res-p b { font-weight: 900; color: var(--ink); }
+  .block { padding: 24px 0; border-top: 1px solid var(--rule); margin-top: 24px; }
+  .block .res-h { font-size: 19px; }
+
+  .toast { position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 12px); opacity: 0; background: var(--ink); color: #fff; font-weight: 700; font-size: 13px; padding: 10px 16px; border-radius: 4px; z-index: 80; transition: all .25s; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  .foot { text-align: center; color: var(--sub); font-size: 12px; margin-top: 26px; }
+  @media (max-height: 700px) { .quote { font-size: 19px; margin-bottom: 18px; } .step .txt { padding: 6px 12px; } }
+</style>
+</head>
+<body>
+
+<!-- 開始数・完了数・診断への遷移数だけを数える非表示フォーム（Netlify Forms）。個人情報は送らない -->
+<form name="game-event" method="POST" data-netlify="true" hidden>
+  <input type="text" name="event">
+  <input type="text" name="detail">
+  <input type="text" name="ref">
+</form>
+
+<div class="container">
+
+  <!-- ================= TITLE ================= -->
+  <div class="screen active" id="screen-title">
+    <div class="head">
+      <div>
+        <div class="brand">脳内 HACK SALES</div>
+        <div class="meta">全5問 ／ 約90秒 ／ 登録なし</div>
+      </div>
+      <svg class="stair-mark" viewBox="0 0 54 40" aria-hidden="true">
+        <path d="M1 39h10V31h10V23h10V15h10V7h12V1" fill="none" stroke="#1D1D1B" stroke-width="2.5" stroke-linejoin="miter"/>
+        <rect x="42" y="1" width="11" height="6" fill="#D0391E"/>
+      </svg>
+    </div>
+    <div class="from-badge" id="fromBadge"></div>
+    <h1>お客さんの"段"、<br>読めますか。</h1>
+    <div class="lead">営業って、実は読み合い。</div>
+    <p class="desc">お客さんの気持ちは、階段みたいに進んでいく。ひとことを聞いて、<b>いま何段目にいるか</b>を当てる。営業をやったことがなくても遊べる。やってみると、ふだんの仕事や会話でもやってることに気づく。</p>
+
+    <div class="legend-title">お客さんの気持ちの階段（これが「段」）</div>
+    <div class="legend" id="legend"></div>
+
+    <button class="btn accent" id="startBtn">はじめる（まず練習1問）</button>
+    <button class="btn ghost" id="skipBtn">練習なしで始める</button>
+    <p class="note">ログイン・入力は不要。スマホでそのまま遊べる。<br>脳内Hack Sales 主宰・脇真央 監修</p>
+  </div>
+
+  <!-- ================= PLAY ================= -->
+  <div class="screen" id="screen-play">
+    <div class="bar">
+      <div class="qno" id="qno">1 <small>/ 5</small></div>
+      <button class="help" id="helpBtn">段とは？</button>
+      <div class="tally" id="tally"></div>
+    </div>
+    <div class="timer" id="timer"><div id="timerFill"></div></div>
+
+    <div class="scene" id="scene"></div>
+    <div class="quote" id="quote"></div>
+
+    <div class="ask">この人は、いま何段目？</div>
+    <div class="stairs" id="stairs"></div>
+  </div>
+
+  <div class="sheet" id="sheet">
+    <div class="sheet-in">
+      <div class="verdict" id="verdict"></div>
+      <div class="why" id="why"></div>
+      <button class="btn" id="nextBtn">次へ</button>
+    </div>
+  </div>
+
+  <div class="backdrop" id="backdrop"></div>
+  <div class="sheet help-sheet" id="helpSheet">
+    <div class="sheet-in">
+      <div class="verdict" style="font-size:20px">「段」は、お客さんの気持ちの進み具合</div>
+      <div class="legend" id="helpLegend" style="margin:10px 0 14px"></div>
+      <button class="btn" id="helpClose">閉じる</button>
+    </div>
+  </div>
+
+  <!-- ================= RESULT ================= -->
+  <div class="screen" id="screen-result">
+    <div class="r-label">RESULT</div>
+    <div class="r-score"><span id="resExact">0</span><small>/ 5 ぴったり</small></div>
+    <div class="recap" id="recap"></div>
+
+    <div class="sec-label">あなたが外しやすい方向</div>
+    <div class="gauge"><i style="left:0"></i><i style="left:50%"></i><i style="right:0"></i><div class="pin" id="gaugePin"></div></div>
+    <div class="gauge-lbl"><span>低めに読む</span><b>ぴったり</b><span>高めに読む</span></div>
+    <h2 class="res-h" id="dirTitle"></h2>
+    <p class="res-p" id="dirBody"></p>
+
+    <div class="block">
+      <h2 class="res-h">営業の外でも、同じ。</h2>
+      <p class="res-p">上司に企画を通す。同僚に頼みごとをする。取引先と交渉する。どれも、相手がいま何段目にいるかで、通りやすさが変わる。<br><br>営業は、意外とこういうゲーム。難しい話じゃない。ここを突き詰めた人から、仕事での価値が上がっていく。</p>
+    </div>
+
+    <div id="ctaDiag">
+      <button class="btn accent" id="toDiagBtn">自分の"型"を、1分で診断する</button>
+      <button class="btn ghost" id="replayBtn">もう一回やる（問題は毎回変わる）</button>
+    </div>
+    <div id="ctaLine" style="display:none;">
+      <a class="btn line" id="lineBtn" target="_blank" rel="noopener">公式LINEで、続きを受け取る</a>
+      <button class="btn ghost" id="replayBtn2">もう一回やる（問題は毎回変わる）</button>
+    </div>
+    <button class="btn ghost" id="shareBtn">友だち・同僚にも送る</button>
+    <p class="foot">脳内Hack Sales 主宰・脇真央 監修</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ==================== CONFIG ====================
+const LINE_URL = "https://s.lmes.jp/landing-qr/1657797570-2Dj9r0mz?uLand=tdJr5c";
+const DIAG_URL = "https://fantastic-chaja-6383fb.netlify.app/";
+const GAME_URL = "https://fantastic-chaja-6383fb.netlify.app/game/";
+const TIME_LIMIT = 15000; // 1問あたり15秒
+const urlParams = new URLSearchParams(window.location.search);
+const refParam = urlParams.get('ref') || '';
+const fromDiag = urlParams.get('from') === 'diag';
+const diagType = urlParams.get('type') || '';
+
+// ==================== EVENT LOG (Netlify Forms) ====================
+// 「開始」「完了」「診断へ進んだ」「LINEタップ」などだけを数える。個人情報は送らない。
+function track(eventName, detail) {
+  try {
+    const body = new URLSearchParams({
+      'form-name': 'game-event',
+      event: eventName,
+      detail: detail || '',
+      ref: (fromDiag ? 'diag' : (refParam ? 'ref' : ''))
+    });
+    fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString(),
+      keepalive: true
+    }).catch(() => {});
+  } catch (e) {}
+}
+
+// ==================== DATA ====================
+const STAGES = {
+  5: { t: '社内',       d: '決めたい。あとは社内を通すだけ' },
+  4: { t: '比較',       d: '選ぶために、並べて見ている' },
+  3: { t: '方法',       d: 'どうすればいいか、知りたい' },
+  2: { t: '困りごと',   d: 'ちょっと困っている・不安' },
+  1: { t: 'いまのまま', d: '特に困っていない' }
+};
+
+// 各段の「たとえばこう言う」例（問題文とは別の言い回し）
+const EX = {
+  1: '「いまのやり方で、特に困ってないですね」',
+  2: '「最近ちょっとここが大変で…何とかしたいとは思ってます」',
+  3: '「それって、どうやったらできるんですか？」',
+  4: '「他の会社とも比べて決めたいんですが」',
+  5: '「自分は決めました。あとは上に通すだけです」'
+};
+// 練習問題（点数に入らない）
+const PRACTICE = { scene: '初めての訪問で', line: '最近、現場がちょっと大変で…。何とかしなきゃとは思ってるんです。', ans: 2,
+  why: '困っていることは、口に出した。でも「どうすればいいか」はまだ聞いてない。<b>困ってる＝2段目</b>。「どうやって？」と方法を聞き始めたら、3段目に上がる。この見分けを、本番でも使う。' };
+
+// scene=場面, line=お客さんのひとこと, ans=正解の段, why=読み方
+const POOL = [
+  { scene: '提案の終わりに', line: 'いいですね。資料だけいただけますか？ あとで見ておきます。', ans: 1,
+    why: '丁寧で前向きに聞こえる。でも<b>話を終わらせる言葉</b>。興味が動いたわけじゃない。いまは<b>1段目（いまのまま）</b>。' },
+  { scene: '電話の最後に', line: 'なるほど。また何かあったら、こちらから連絡しますね。', ans: 1,
+    why: '「こちらから」と言った時点で、主導権は相手。動く気がない<b>1段目（いまのまま）</b>。' },
+  { scene: '雑談のなかで', line: '正直、最近ちょっと現場がバタついてて…。まあ、なんとかしてますけど。', ans: 2,
+    why: '困りごとはにじんでる。でも<b>「なんとかしてる」</b>。方法を知りたい段には、まだ来てない。<b>2段目（困りごと）</b>。' },
+  { scene: '打ち合わせの合間に', line: '前の担当の人が辞めてから、ちょっと不安なんですよね。', ans: 2,
+    why: '「不安」という感情が出た。ここで解決策を並べるのは早い。まず<b>2段目（困りごと）</b>をじっくり聞く場面。' },
+  { scene: '2回目の訪問で', line: '他の会社さんは、どうやって解決してるんですか？', ans: 3,
+    why: '「どうやって」と<b>方法</b>を聞いてきた。困りごとから一段上がった<b>3段目（方法）</b>。まだ「選ぶ」前。' },
+  { scene: '提案の途中で', line: 'それ、うちの場合だと、何がどう変わるんですか？', ans: 3,
+    why: '自分ごととして想像し始めた合図。ただし比較はしてない。<b>3段目（方法）</b>。価格や他社の話は早い。' },
+  { scene: '見積もりを出したあと', line: 'A案とB案、費用と導入までの期間でどう違いますか？', ans: 4,
+    why: '選択肢を並べて見ている。<b>選ぶ段階</b>に入った<b>4段目（比較）</b>。' },
+  { scene: '商談の後半で', line: '他社の見積もりも取ってるんですけど、御社の強みって何ですか？', ans: 4,
+    why: '他社も見ている＝比較中。決めたわけじゃなく、<b>選んでいる最中</b>の<b>4段目（比較）</b>。' },
+  { scene: '商談のおわりに', line: '私は良いと思うんですが、部長にどう説明すればいいか…。', ans: 5,
+    why: '本人の気持ちは固まってる。残ってるのは<b>社内を通すこと</b>。<b>5段目（社内）</b>。' },
+  { scene: '最終の打ち合わせで', line: '条件は問題ないです。あとは稟議の書き方を教えてもらえますか。', ans: 5,
+    why: 'もう決めてる。必要なのは<b>社内を通すための材料</b>。<b>5段目（社内）</b>。' }
+];
+
+// ==================== HELPERS ====================
+const $ = id => document.getElementById(id);
+function show(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $('screen-' + name).classList.add('active');
+  window.scrollTo(0, 0);
+}
+function toast(msg) {
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+function vib(p) { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
+function pickQuestions() {
+  const pool = POOL.slice().sort(() => Math.random() - .5);
+  const picked = [], cnt = {};
+  for (const q of pool) {
+    if ((cnt[q.ans] || 0) >= 2) continue;
+    picked.push(q); cnt[q.ans] = (cnt[q.ans] || 0) + 1;
+    if (picked.length === 5) break;
+  }
+  return picked.sort(() => Math.random() - .5);
+}
+
+// ==================== LEGEND ====================
+function fillLegend(box) {
+  box.innerHTML = '';
+  [1, 2, 3, 4, 5].forEach(n => {
+    const d = document.createElement('div');
+    d.innerHTML = '<b>' + n + '段目</b><div><em>' + STAGES[n].t + '</em><span>' + STAGES[n].d + '</span><span class="ex">' + EX[n] + '</span></div>';
+    box.appendChild(d);
+  });
+}
+
+// ==================== TITLE ====================
+(function initTitle() {
+  fillLegend($('legend')); fillLegend($('helpLegend'));
+  if (fromDiag) {
+    const b = $('fromBadge');
+    b.style.display = 'block';
+    b.textContent = (diagType ? '診断おつかれさま（' + diagType + '）。' : '診断おつかれさま。') + 'こんどは、お客さんの"段"を読むゲーム。自分の型と見比べながらやってみて。';
+  }
+})();
+
+// ==================== GAME STATE ====================
+let Q = [], idx = 0, results = [], timerRaf = null, timerStart = 0, locked = true, practice = false, timerOn = false, qToken = 0, remainMs = TIME_LIMIT;
+const curQ = () => practice ? PRACTICE : Q[idx];
+
+$('startBtn').addEventListener('click', () => startGame(true));
+$('skipBtn').addEventListener('click', () => startGame(false));
+function startGame(withPractice) {
+  Q = pickQuestions(); idx = 0; results = []; practice = !!withPractice;
+  track('game_start', (fromDiag ? 'from_diag;' : '') + (withPractice ? 'practice' : 'no_practice'));
+  show('play');
+  showQuestion();
+}
+
+function renderTally() {
+  const t = $('tally'); t.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const d = document.createElement('i');
+    const r = results[i];
+    if (r) d.className = r.kind === 'ok' ? 'ok' : 'ng';
+    t.appendChild(d);
+  }
+}
+
+function buildStairs() {
+  const box = $('stairs'); box.innerHTML = '';
+  [5, 4, 3, 2, 1].forEach(n => {
+    const s = STAGES[n];
+    const b = document.createElement('button');
+    b.className = 'step locked wait'; b.dataset.n = n;
+    b.style.setProperty('--ml', ((n - 1) * 9) + 'px');
+    b.innerHTML = '<span class="n">' + n + '</span><span class="txt"><div class="t">' + s.t + '</div><div class="d">' + s.d + '</div></span><span class="tag"></span>';
+    b.addEventListener('click', () => answer(n));
+    box.appendChild(b);
+  });
+}
+
+function showQuestion() {
+  const q = curQ(), tok = ++qToken;
+  $('sheet').classList.remove('show');
+  if (practice) {
+    $('qno').innerHTML = '練習<span class="badge-p">点数に入らない</span>';
+    $('tally').style.visibility = 'hidden'; $('timer').style.visibility = 'hidden';
+  } else {
+    $('qno').innerHTML = (idx + 1) + ' <small>/ 5</small>';
+    $('tally').style.visibility = 'visible'; $('timer').style.visibility = 'visible';
+  }
+  renderTally();
+  $('scene').textContent = 'シーン：' + q.scene;
+  $('quote').textContent = '「' + q.line + '」';
+  buildStairs();
+  // 読む時間を少しだけ置いてから押せるようにする
+  locked = true;
+  const readMs = Math.min(1400, 500 + q.line.length * 18);
+  $('timerFill').style.transform = 'scaleX(1)'; $('timerFill').classList.remove('low');
+  setTimeout(() => {
+    if (tok !== qToken) return;
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('locked', 'wait'));
+    locked = false; if (!practice) startTimer();
+  }, readMs);
+}
+
+function startTimer(fromMs) {
+  const fill = $('timerFill');
+  timerOn = true;
+  timerStart = performance.now() - (TIME_LIMIT - (fromMs == null ? TIME_LIMIT : fromMs));
+  cancelAnimationFrame(timerRaf);
+  const loop = now => {
+    const left = Math.max(0, 1 - (now - timerStart) / TIME_LIMIT);
+    fill.style.transform = 'scaleX(' + left + ')';
+    if (left < .33) fill.classList.add('low');
+    if (left <= 0) { timeUp(); return; }
+    timerRaf = requestAnimationFrame(loop);
+  };
+  timerRaf = requestAnimationFrame(loop);
+}
+function stopTimer() { cancelAnimationFrame(timerRaf); timerOn = false; }
+function lockAll() { document.querySelectorAll('.step').forEach(s => s.classList.add('locked')); }
+
+function answer(n) {
+  if (locked) return;
+  locked = true; stopTimer(); lockAll();
+  const q = curQ();
+  const diff = n - q.ans, abs = Math.abs(diff);
+  let kind, verdict, vcls;
+  if (abs === 0) { kind = 'ok'; verdict = 'ぴったり。'; vcls = 'ok'; vib(25); }
+  else if (abs === 1) { kind = 'near'; verdict = '1段ズレ。'; vcls = 'near'; vib(20); }
+  else { kind = 'far'; verdict = abs + '段ズレ。'; vcls = 'far'; vib([35, 25, 35]); }
+  if (!practice) results.push({ ans: q.ans, pick: n, diff, kind });
+  document.querySelectorAll('.step').forEach(s => {
+    const sn = +s.dataset.n, tag = s.querySelector('.tag');
+    if (sn === q.ans) { s.classList.add('right'); tag.textContent = '正解'; }
+    else if (sn === n) { s.classList.add('wrong'); tag.textContent = diff > 0 ? '高く読んだ' : '低く読んだ'; }
+    else s.classList.add('dim');
+  });
+  renderTally();
+  openSheet(verdict, vcls, q.why);
+}
+function timeUp() {
+  if (locked) return;
+  locked = true; lockAll();
+  const q = curQ();
+  results.push({ ans: q.ans, pick: null, diff: 0, kind: 'time' });
+  document.querySelectorAll('.step').forEach(s => {
+    if (+s.dataset.n === q.ans) { s.classList.add('right'); s.querySelector('.tag').textContent = '正解'; }
+    else s.classList.add('dim');
+  });
+  renderTally();
+  openSheet('時間切れ。', 'time', '迷ったときは、<b>一段低め</b>に置くのが基本。' + q.why);
+}
+function openSheet(verdict, vcls, why) {
+  const v = $('verdict'); v.textContent = verdict; v.className = 'verdict ' + vcls;
+  $('why').innerHTML = why;
+  $('nextBtn').textContent = practice ? '本番をはじめる（5問）' : (idx === 4 ? '結果を見る' : '次のお客さん');
+  setTimeout(() => $('sheet').classList.add('show'), 250);
+}
+$('nextBtn').addEventListener('click', () => {
+  $('sheet').classList.remove('show');
+  if (practice) { practice = false; idx = 0; setTimeout(showQuestion, 200); return; }
+  if (idx === 4) { setTimeout(showResult, 200); return; }
+  idx++; setTimeout(showQuestion, 200);
+});
+
+// ==================== HELP ====================
+let helpWasRunning = false;
+$('helpBtn').addEventListener('click', () => {
+  helpWasRunning = timerOn;
+  if (timerOn) { remainMs = Math.max(0, TIME_LIMIT - (performance.now() - timerStart)); stopTimer(); }
+  $('backdrop').classList.add('show'); $('helpSheet').classList.add('show');
+  track('help_open', '');
+});
+function closeHelp() {
+  $('backdrop').classList.remove('show'); $('helpSheet').classList.remove('show');
+  if (helpWasRunning && !locked) startTimer(remainMs);
+  helpWasRunning = false;
+}
+$('helpClose').addEventListener('click', closeHelp);
+$('backdrop').addEventListener('click', closeHelp);
+
+// ==================== RESULT ====================
+let lastDirection = '';
+function showResult() {
+  $('sheet').classList.remove('show'); stopTimer();
+  const answered = results.filter(r => r.kind !== 'time');
+  const exact = results.filter(r => r.kind === 'ok').length;
+  const over = answered.filter(r => r.diff > 0).length;
+  const under = answered.filter(r => r.diff < 0).length;
+  const net = answered.reduce((s, r) => s + r.diff, 0);
+
+  let dir, title, body;
+  if (exact === 5) {
+    dir = 'perfect'; title = '5問ぜんぶ、ぴったり。読めてる。';
+    body = 'ズレなし。相手の言葉の裏を、ちゃんと拾えてる。次は、読んだ相手に<b>どう動くか</b>。自分の"型"を知ると、そこがはっきりする。';
+  } else if (over > under) {
+    dir = 'high'; title = '高めに読みやすい。';
+    body = '相手を、実際より<b>一歩進んだ段</b>に置いてる。丁寧な返事や前向きな相づちを「興味あり」と取るクセ。営業で一番多いズレで、直すだけで商談が動きやすくなる。<b>迷ったら、一段下に置く。</b>';
+  } else if (under > over) {
+    dir = 'low'; title = '低めに読みやすい。';
+    body = '相手を、実際より<b>手前の段</b>に置いてる。慎重なぶん、相手がもう進んでいるのに前の段の話を続けてしまう。<b>相手の質問の中身を信じて、一段上へ。</b>';
+  } else {
+    dir = 'mixed'; title = '読み方が揺れた。';
+    body = '高く読む問題も、低く読む問題もあった。相手の言葉より、<b>その場の空気や自分の気分</b>に引っ張られてる。段というものさしを一つ持つだけで、安定する。';
+  }
+  lastDirection = dir;
+
+  const rc = $('recap'); rc.innerHTML = '';
+  results.forEach((r, i) => {
+    const d = document.createElement('div');
+    let m, cls;
+    if (r.kind === 'ok') { m = 'ぴったり'; cls = 'ok'; }
+    else if (r.kind === 'time') { m = '時間切れ'; cls = 'to'; }
+    else if (r.diff > 0) { m = '高く読んだ'; cls = 'ng'; }
+    else { m = '低く読んだ'; cls = 'ng'; }
+    const you = r.pick ? 'あなた <b>' + r.pick + '段目</b>' : 'あなた <b>—</b>';
+    d.innerHTML = '<span class="q">Q' + (i + 1) + '</span><span class="a">' + you + ' ／ 正解 <b>' + r.ans + '段目</b></span><span class="m ' + cls + '">' + m + '</span>';
+    rc.appendChild(d);
+  });
+
+  $('dirTitle').textContent = title; $('dirBody').innerHTML = body;
+  show('result');
+  countUp($('resExact'), exact, 600);
+  const pos = Math.max(4, Math.min(96, 50 + (net / 6) * 46));
+  setTimeout(() => { $('gaugePin').style.left = pos + '%'; }, 300);
+
+  if (fromDiag) { $('ctaDiag').style.display = 'none'; $('ctaLine').style.display = 'block'; }
+  track('game_complete', 'dir=' + dir + ';exact=' + exact);
+}
+function countUp(el, to, ms) {
+  const t0 = performance.now();
+  const f = now => {
+    const p = Math.min(1, (now - t0) / ms);
+    el.textContent = Math.round(to * p);
+    if (p < 1) requestAnimationFrame(f);
+  };
+  requestAnimationFrame(f);
+}
+
+// ==================== CTAs ====================
+$('toDiagBtn').addEventListener('click', () => {
+  track('to_diagnosis', 'dir=' + lastDirection);
+  setTimeout(() => { window.location.href = DIAG_URL + '?ref=game'; }, 120);
+});
+function replay() { track('replay', ''); $('gaugePin').style.left = '50%'; startGame(false); }
+$('replayBtn').addEventListener('click', replay);
+$('replayBtn2').addEventListener('click', replay);
+$('lineBtn').href = LINE_URL;
+$('lineBtn').addEventListener('click', () => track('line_tap', 'dir=' + lastDirection));
+$('shareBtn').addEventListener('click', async () => {
+  track('share', '');
+  const text = 'お客さんの"段"、読めますか。営業って、実は読み合い。90秒でできる。';
+  try {
+    if (navigator.share) { await navigator.share({ title: 'お客さんの"段"、読めますか。', text, url: GAME_URL }); return; }
+  } catch (e) { return; }
+  try { await navigator.clipboard.writeText(text + ' ' + GAME_URL); toast('リンクをコピーしました'); }
+  catch (e) { toast(GAME_URL); }
+});
+</script>
+</body>
+</html>
