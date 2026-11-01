@@ -159,14 +159,14 @@
     <div class="from-badge" id="fromBadge"></div>
     <h1>お客さんの"段"、<br>読めますか。</h1>
     <div class="lead">営業って、実は読み合い。</div>
-    <p class="desc">お客さんの気持ちは、階段みたいに進んでいく。ひとことを聞いて、<b>いま何段目にいるか</b>を当てる。営業をやったことがなくても遊べる。やってみると、ふだんの仕事や会話でもやってることに気づく。</p>
+    <p class="desc">お客さんの気持ちは、1段ずつしか上がらない。これを「感情の階段」と呼ぶ。ひとことを聞いて、<b>いま何段目にいるか</b>を当てる。営業をやったことがなくても遊べる。やってみると、ふだんの仕事や会話でもやってることに気づく。</p>
 
-    <div class="legend-title">お客さんの気持ちの階段（これが「段」）</div>
+    <div class="legend-title">「感情の階段」（これが「段」）</div>
     <div class="legend" id="legend"></div>
 
     <button class="btn accent" id="startBtn">はじめる（まず練習1問）</button>
     <button class="btn ghost" id="skipBtn">練習なしで始める</button>
-    <p class="note">ログイン・入力は不要。スマホでそのまま遊べる。<br>脳内Hack Sales 主宰・脇真央 監修</p>
+    <p class="note">ログイン・入力は不要。スマホでそのまま遊べる。<br>脳内Hack Sales 主宰・わき 監修</p>
   </div>
 
   <!-- ================= PLAY ================= -->
@@ -196,7 +196,7 @@
   <div class="backdrop" id="backdrop"></div>
   <div class="sheet help-sheet" id="helpSheet">
     <div class="sheet-in">
-      <div class="verdict" style="font-size:20px">「段」は、お客さんの気持ちの進み具合</div>
+      <div class="verdict" style="font-size:20px">「段」は、感情の階段の何段目か</div>
       <div class="legend" id="helpLegend" style="margin:10px 0 14px"></div>
       <button class="btn" id="helpClose">閉じる</button>
     </div>
@@ -210,7 +210,7 @@
 
     <div class="sec-label">あなたが外しやすい方向</div>
     <div class="gauge"><i style="left:0"></i><i style="left:50%"></i><i style="right:0"></i><div class="pin" id="gaugePin"></div></div>
-    <div class="gauge-lbl"><span>低めに読む</span><b>ぴったり</b><span>高めに読む</span></div>
+    <div class="gauge-lbl"><span>低く見積もる</span><b>ぴったり</b><span>高く見積もる</span></div>
     <h2 class="res-h" id="dirTitle"></h2>
     <p class="res-p" id="dirBody"></p>
 
@@ -224,11 +224,11 @@
       <button class="btn ghost" id="replayBtn">もう一回やる（問題は毎回変わる）</button>
     </div>
     <div id="ctaLine" style="display:none;">
-      <a class="btn line" id="lineBtn" target="_blank" rel="noopener">公式LINEで、続きを受け取る</a>
+      <a class="btn line" id="lineBtn" target="_blank" rel="noopener">公式LINEで、"型"の診断を受け取る</a>
       <button class="btn ghost" id="replayBtn2">もう一回やる（問題は毎回変わる）</button>
     </div>
     <button class="btn ghost" id="shareBtn">友だち・同僚にも送る</button>
-    <p class="foot">脳内Hack Sales 主宰・脇真央 監修</p>
+    <p class="foot">脳内Hack Sales 主宰・わき 監修</p>
   </div>
 </div>
 
@@ -236,7 +236,7 @@
 
 <script>
 // ==================== CONFIG ====================
-const LINE_URL = "https://s.lmes.jp/landing-qr/1657797570-2Dj9r0mz?uLand=tdJr5c";
+const LINE_URL = "https://s.lmes.jp/landing-qr/1657797570-2Dj9r0mz?uLand=Wp8HKi";
 const DIAG_URL = "https://fantastic-chaja-6383fb.netlify.app/";
 const GAME_URL = "https://fantastic-chaja-6383fb.netlify.app/game/";
 const TIME_LIMIT = 15000; // 1問あたり15秒
@@ -265,48 +265,66 @@ function track(eventName, detail) {
 }
 
 // ==================== DATA ====================
+// 出典：脳内Hack Sales 第4回「相手をハックする」p17（段の名前）・p19（話題と状態・セリフ例）
 const STAGES = {
-  5: { t: '社内',       d: '決めたい。あとは社内を通すだけ' },
-  4: { t: '比較',       d: '選ぶために、並べて見ている' },
-  3: { t: '方法',       d: 'どうすればいいか、知りたい' },
-  2: { t: '困りごと',   d: 'ちょっと困っている・不安' },
-  1: { t: 'いまのまま', d: '特に困っていない' }
+  5: { t: '決断・購入', topic: '社内',       d: '話題＝社内' },
+  4: { t: '解決策',     topic: '比較',       d: '話題＝比較' },
+  3: { t: '欲求・関心', topic: '方法',       d: '話題＝方法' },
+  2: { t: '不満・不安', topic: '困りごと',   d: '話題＝困りごと' },
+  1: { t: '無関心',     topic: 'いまのまま', d: '話題＝いまのまま' }
+};
+const STATE = {
+  1: '問題として見えていない。いまのままで回っている',
+  2: '問題には気づいた。でも、まだ動くほどではない',
+  3: 'なんとかしたい。方法を探しはじめた',
+  4: '解決する前提で、やり方や相手を比べている',
+  5: '買う前提で、社内の通し方を気にしている'
 };
 
-// 各段の「たとえばこう言う」例（問題文とは別の言い回し）
+// 各段の「たとえばこう言う」例（講義p19のセリフ例）
 const EX = {
-  1: '「いまのやり方で、特に困ってないですね」',
-  2: '「最近ちょっとここが大変で…何とかしたいとは思ってます」',
-  3: '「それって、どうやったらできるんですか？」',
-  4: '「他の会社とも比べて決めたいんですが」',
-  5: '「自分は決めました。あとは上に通すだけです」'
+  1: '「うち、間に合ってるので」「特に困ってないですね」',
+  2: '「言われてみれば、たしかに」「そこは前から気になってたんですよね」',
+  3: '「どうすればいいんですか？」「それ、うちでもできるんですか？」',
+  4: '「他社さんとは、何が違うんですか？」「ほかにどんなやり方があります？」',
+  5: '「社内で通すには、何が要りますか？」「上に出す資料、もらえます？」'
 };
 // 練習問題（点数に入らない）
 const PRACTICE = { scene: '初めての訪問で', line: '最近、現場がちょっと大変で…。何とかしなきゃとは思ってるんです。', ans: 2,
-  why: '困っていることは、口に出した。でも「どうすればいいか」はまだ聞いてない。<b>困ってる＝2段目</b>。「どうやって？」と方法を聞き始めたら、3段目に上がる。この見分けを、本番でも使う。' };
+  why: '困っていることは、口に出した。でも「どうすればいいか」はまだ聞いてない。<b>話題が「困りごと」＝2段目「不満・不安」</b>。「どうすれば？」と方法の話になったら、3段目「欲求・関心」に上がる。聞くのは言葉そのものより「何の話をしてるか」。この見分けを、本番でも使う。' };
 
 // scene=場面, line=お客さんのひとこと, ans=正解の段, why=読み方
 const POOL = [
   { scene: '提案の終わりに', line: 'いいですね。資料だけいただけますか？ あとで見ておきます。', ans: 1,
-    why: '丁寧で前向きに聞こえる。でも<b>話を終わらせる言葉</b>。興味が動いたわけじゃない。いまは<b>1段目（いまのまま）</b>。' },
+    why: '丁寧で前向きに聞こえる。でも<b>話を終わらせる言葉</b>。興味が動いたわけじゃない。いまは<b>1段目「無関心」（話題＝いまのまま）</b>。' },
   { scene: '電話の最後に', line: 'なるほど。また何かあったら、こちらから連絡しますね。', ans: 1,
-    why: '「こちらから」と言った時点で、主導権は相手。動く気がない<b>1段目（いまのまま）</b>。' },
+    why: '「こちらから」と言った時点で、主導権は相手。動く気がない<b>1段目「無関心」（話題＝いまのまま）</b>。' },
   { scene: '雑談のなかで', line: '正直、最近ちょっと現場がバタついてて…。まあ、なんとかしてますけど。', ans: 2,
-    why: '困りごとはにじんでる。でも<b>「なんとかしてる」</b>。方法を知りたい段には、まだ来てない。<b>2段目（困りごと）</b>。' },
+    why: '困りごとはにじんでる。でも<b>「なんとかしてる」</b>。方法を知りたい段には、まだ来てない。<b>2段目「不満・不安」（話題＝困りごと）</b>。' },
   { scene: '打ち合わせの合間に', line: '前の担当の人が辞めてから、ちょっと不安なんですよね。', ans: 2,
-    why: '「不安」という感情が出た。ここで解決策を並べるのは早い。まず<b>2段目（困りごと）</b>をじっくり聞く場面。' },
-  { scene: '2回目の訪問で', line: '他の会社さんは、どうやって解決してるんですか？', ans: 3,
-    why: '「どうやって」と<b>方法</b>を聞いてきた。困りごとから一段上がった<b>3段目（方法）</b>。まだ「選ぶ」前。' },
+    why: '「不安」という感情が出た。ここで解決策を並べるのは早い。まず<b>2段目「不満・不安」（話題＝困りごと）</b>をじっくり聞く場面。' },
+  { scene: '2回目の訪問で', line: 'どうすれば、うちでも解決できるんですか？', ans: 3,
+    why: '「どうすれば」と<b>方法</b>を聞いてきた。困りごとから一段上がった<b>3段目「欲求・関心」（話題＝方法）</b>。まだ他社と「比べる」前。' },
   { scene: '提案の途中で', line: 'それ、うちの場合だと、何がどう変わるんですか？', ans: 3,
-    why: '自分ごととして想像し始めた合図。ただし比較はしてない。<b>3段目（方法）</b>。価格や他社の話は早い。' },
+    why: '自分ごととして想像し始めた合図。ただし比較はしてない。<b>3段目「欲求・関心」（話題＝方法）</b>。価格や他社の話は早い。' },
   { scene: '見積もりを出したあと', line: 'A案とB案、費用と導入までの期間でどう違いますか？', ans: 4,
-    why: '選択肢を並べて見ている。<b>選ぶ段階</b>に入った<b>4段目（比較）</b>。' },
+    why: '選択肢を並べて見ている。<b>選ぶ段階</b>に入った<b>4段目「解決策」（話題＝比較）</b>。' },
   { scene: '商談の後半で', line: '他社の見積もりも取ってるんですけど、御社の強みって何ですか？', ans: 4,
-    why: '他社も見ている＝比較中。決めたわけじゃなく、<b>選んでいる最中</b>の<b>4段目（比較）</b>。' },
+    why: '他社も見ている＝比較中。決めたわけじゃなく、<b>選んでいる最中</b>の<b>4段目「解決策」（話題＝比較）</b>。' },
   { scene: '商談のおわりに', line: '私は良いと思うんですが、部長にどう説明すればいいか…。', ans: 5,
-    why: '本人の気持ちは固まってる。残ってるのは<b>社内を通すこと</b>。<b>5段目（社内）</b>。' },
+    why: '本人の気持ちは固まってる。残ってるのは<b>社内を通すこと</b>。<b>5段目「決断・購入」（話題＝社内）</b>。' },
   { scene: '最終の打ち合わせで', line: '条件は問題ないです。あとは稟議の書き方を教えてもらえますか。', ans: 5,
-    why: 'もう決めてる。必要なのは<b>社内を通すための材料</b>。<b>5段目（社内）</b>。' }
+    why: 'もう決めてる。必要なのは<b>社内を通すための材料</b>。<b>5段目「決断・購入」（話題＝社内）</b>。' }
+  ,{ scene: '電話をかけて、最初の10秒で', line: 'うち、間に合ってるので。', ans: 1,
+    why: '「間に合ってる」は、<b>問題として見えていない</b>人の言葉。<b>1段目「無関心」（話題＝いまのまま）</b>。ここで解決策を出すと売り込みになる。' },
+  { scene: 'ヒアリングの途中で', line: '言われてみれば、たしかに、そこは前から気になってたんですよね。', ans: 2,
+    why: '「前から気になってた」と、自分から認めた。ただ、まだ動くほどじゃない。<b>2段目「不満・不安」（話題＝困りごと）</b>。' },
+  { scene: '打ち合わせの終盤に', line: 'ここまで聞いて、やっぱり何とかしたいなと思いました。どうすればいいんですか？', ans: 3,
+    why: '「どうすればいいんですか？」と<b>方法</b>を聞いてきた。<b>3段目「欲求・関心」（話題＝方法）</b>。まだ他社と比べる前。' },
+  { scene: '2社で迷っている商談で', line: 'A社さんのほうが安いんですが、御社に頼む理由って何ですか？', ans: 4,
+    why: 'A社と並べて、頼む理由を聞いてきた。<b>4段目「解決策」（話題＝比較）</b>。' },
+  { scene: '商談の終わりに', line: '条件はこれで大丈夫そうです。上に出す資料、もらえます？', ans: 5,
+    why: '「上に出す資料」の話をしている。買う前提で、社内の通し方を気にしている<b>5段目「決断・購入」（話題＝社内）</b>。' }
 ];
 
 // ==================== HELPERS ====================
@@ -321,15 +339,20 @@ function toast(msg) {
   setTimeout(() => t.classList.remove('show'), 1800);
 }
 function vib(p) { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
+const seenQ = new Set();
 function pickQuestions() {
-  const pool = POOL.slice().sort(() => Math.random() - .5);
+  // 前に出していない問題を先に使う（もう一回やっても、なるべく別の問題が出る）
+  const pool = POOL.map((q, i) => ({ q, i })).sort(() => Math.random() - .5)
+    .sort((a, b) => (seenQ.has(a.i) ? 1 : 0) - (seenQ.has(b.i) ? 1 : 0));
   const picked = [], cnt = {};
-  for (const q of pool) {
-    if ((cnt[q.ans] || 0) >= 2) continue;
-    picked.push(q); cnt[q.ans] = (cnt[q.ans] || 0) + 1;
+  for (const o of pool) {
+    if ((cnt[o.q.ans] || 0) >= 2) continue;
+    picked.push(o); cnt[o.q.ans] = (cnt[o.q.ans] || 0) + 1;
     if (picked.length === 5) break;
   }
-  return picked.sort(() => Math.random() - .5);
+  picked.forEach(o => seenQ.add(o.i));
+  if (seenQ.size > POOL.length - 5) seenQ.clear();
+  return picked.map(o => o.q).sort(() => Math.random() - .5);
 }
 
 // ==================== LEGEND ====================
@@ -337,7 +360,7 @@ function fillLegend(box) {
   box.innerHTML = '';
   [1, 2, 3, 4, 5].forEach(n => {
     const d = document.createElement('div');
-    d.innerHTML = '<b>' + n + '段目</b><div><em>' + STAGES[n].t + '</em><span>' + STAGES[n].d + '</span><span class="ex">' + EX[n] + '</span></div>';
+    d.innerHTML = '<b>' + n + '段目</b><div><em>' + STAGES[n].t + '</em><span>' + '話題＝' + STAGES[n].topic + '。' + STATE[n] + '</span><span class="ex">' + EX[n] + '</span></div>';
     box.appendChild(d);
   });
 }
@@ -443,7 +466,7 @@ function answer(n) {
   document.querySelectorAll('.step').forEach(s => {
     const sn = +s.dataset.n, tag = s.querySelector('.tag');
     if (sn === q.ans) { s.classList.add('right'); tag.textContent = '正解'; }
-    else if (sn === n) { s.classList.add('wrong'); tag.textContent = diff > 0 ? '高く読んだ' : '低く読んだ'; }
+    else if (sn === n) { s.classList.add('wrong'); tag.textContent = diff > 0 ? '高く見積もった' : '低く見積もった'; }
     else s.classList.add('dim');
   });
   renderTally();
@@ -459,7 +482,7 @@ function timeUp() {
     else s.classList.add('dim');
   });
   renderTally();
-  openSheet('時間切れ。', 'time', '迷ったときは、<b>一段低め</b>に置くのが基本。' + q.why);
+  openSheet('時間切れ。', 'time', '迷ったときは、<b>低いほう</b>に置く。' + q.why);
 }
 function openSheet(verdict, vcls, why) {
   const v = $('verdict'); v.textContent = verdict; v.className = 'verdict ' + vcls;
@@ -503,16 +526,16 @@ function showResult() {
   let dir, title, body;
   if (exact === 5) {
     dir = 'perfect'; title = '5問ぜんぶ、ぴったり。読めてる。';
-    body = 'ズレなし。相手の言葉の裏を、ちゃんと拾えてる。次は、読んだ相手に<b>どう動くか</b>。自分の"型"を知ると、そこがはっきりする。';
+    body = 'ズレなし。相手のセリフから、いま何段目かを、ちゃんと読めてる。次は、読んだ相手に<b>どう動くか</b>。自分の"型"を知ると、そこがはっきりする。';
   } else if (over > under) {
-    dir = 'high'; title = '高めに読みやすい。';
-    body = '相手を、実際より<b>一歩進んだ段</b>に置いてる。丁寧な返事や前向きな相づちを「興味あり」と取るクセ。営業で一番多いズレで、直すだけで商談が動きやすくなる。<b>迷ったら、一段下に置く。</b>';
+    dir = 'high'; title = '高く見積もりやすい。';
+    body = '相手を、実際より<b>高い段</b>に置いてる。丁寧な返事や前向きな相づちを「興味あり」と取るクセ。<b>実際より高く見積もるのが、いちばん多い失敗。</b>まだ困ってると思ってない人に解決策を出すと、売り込みになる。<b>迷ったら、低いほうに置く。</b>';
   } else if (under > over) {
-    dir = 'low'; title = '低めに読みやすい。';
-    body = '相手を、実際より<b>手前の段</b>に置いてる。慎重なぶん、相手がもう進んでいるのに前の段の話を続けてしまう。<b>相手の質問の中身を信じて、一段上へ。</b>';
+    dir = 'low'; title = '低く見積もりやすい。';
+    body = '相手を、実際より<b>低い段</b>に置いてる。慎重なぶん、相手がもう進んでいるのに前の段の話を続けてしまう。もう解決したいと思ってる人に問題提起をくり返すと、くどい。<b>相手のセリフの中身を信じて、1段だけ上へ。</b>';
   } else {
-    dir = 'mixed'; title = '読み方が揺れた。';
-    body = '高く読む問題も、低く読む問題もあった。相手の言葉より、<b>その場の空気や自分の気分</b>に引っ張られてる。段というものさしを一つ持つだけで、安定する。';
+    dir = 'mixed'; title = '見積もりが、揺れた。';
+    body = '高く見積もる問題も、低く見積もる問題もあった。相手の言葉より、<b>その場の空気や自分の気分</b>に引っ張られてる。「感情の階段」というものさしを一つ持つだけで、安定する。';
   }
   lastDirection = dir;
 
@@ -522,8 +545,8 @@ function showResult() {
     let m, cls;
     if (r.kind === 'ok') { m = 'ぴったり'; cls = 'ok'; }
     else if (r.kind === 'time') { m = '時間切れ'; cls = 'to'; }
-    else if (r.diff > 0) { m = '高く読んだ'; cls = 'ng'; }
-    else { m = '低く読んだ'; cls = 'ng'; }
+    else if (r.diff > 0) { m = '高く見積もった'; cls = 'ng'; }
+    else { m = '低く見積もった'; cls = 'ng'; }
     const you = r.pick ? 'あなた <b>' + r.pick + '段目</b>' : 'あなた <b>—</b>';
     d.innerHTML = '<span class="q">Q' + (i + 1) + '</span><span class="a">' + you + ' ／ 正解 <b>' + r.ans + '段目</b></span><span class="m ' + cls + '">' + m + '</span>';
     rc.appendChild(d);
@@ -535,7 +558,7 @@ function showResult() {
   const pos = Math.max(4, Math.min(96, 50 + (net / 6) * 46));
   setTimeout(() => { $('gaugePin').style.left = pos + '%'; }, 300);
 
-  if (fromDiag) { $('ctaDiag').style.display = 'none'; $('ctaLine').style.display = 'block'; }
+  $('ctaDiag').style.display = 'none'; $('ctaLine').style.display = 'block';
   track('game_complete', 'dir=' + dir + ';exact=' + exact);
 }
 function countUp(el, to, ms) {
