@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#F4F0E8">
+<title>どっちが、営業できてる？ | 脳内Hack Sales</title>
+<meta name="description" content="お客さんのひとことに、営業マンが2通りで返す。どっちが営業できてる？ 5問・90秒のゲーム。">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@600;900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+
+  :root {
+    --paper: #F4F0E8;
+    --paper-2: #FBF9F4;
+    --ink: #1D1D1B;
+    --sub: #6B665C;
+    --rule: #D9D2C3;
+    --accent: #D0391E;
+    --ok: #1F7A4D;
+    --line-green: #06C755;
+    --serif: 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+    --sans: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { background: var(--paper); }
+  body { font-family: var(--sans); background: var(--paper); color: var(--ink); min-height: 100vh; overflow-x: hidden; -webkit-user-select: none; user-select: none; line-height: 1.7; }
+  .container { max-width: 520px; margin: 0 auto; padding: 22px 20px 48px; min-height: 100vh; }
+
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadeIn .3s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* ===== TITLE ===== */
+  .head { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid var(--ink); padding-bottom: 12px; margin-bottom: 22px; }
+  .brand { font-size: 12px; font-weight: 700; letter-spacing: .12em; }
+  .meta { font-size: 12px; color: var(--sub); margin-top: 2px; }
+  .stair-mark { width: 54px; height: 40px; flex: 0 0 54px; }
+  .from-badge { display: none; margin-bottom: 18px; padding: 10px 12px; font-size: 13px; line-height: 1.7; border-left: 3px solid var(--accent); background: var(--paper-2); }
+  h1 { font-family: var(--serif); font-weight: 900; font-size: 32px; line-height: 1.45; margin-bottom: 6px; letter-spacing: .01em; }
+  .lead { font-family: var(--serif); font-weight: 600; font-size: 18px; margin-bottom: 18px; color: var(--accent); }
+  .desc b { font-weight: 900; color: var(--ink); }
+  .desc { font-size: 14.5px; color: #3A372F; line-height: 1.9; margin-bottom: 20px; }
+
+  .legend-title { font-size: 12px; font-weight: 700; color: var(--sub); letter-spacing: .06em; margin-bottom: 8px; }
+  .legend { margin-bottom: 22px; border-top: 1px solid var(--rule); }
+  .legend > div { display: grid; grid-template-columns: 56px 1fr; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--rule); }
+  .legend b { font-family: var(--serif); font-weight: 900; font-size: 15px; }
+  .legend em { font-style: normal; font-weight: 900; font-size: 15px; margin-right: 8px; }
+  .legend span { font-size: 12.5px; color: var(--sub); }
+  .legend .ex { display: block; margin-top: 3px; font-family: var(--serif); font-weight: 600; font-size: 13.5px; color: #3A372F; }
+
+  .btn { display: block; width: 100%; padding: 17px; font-family: var(--sans); font-size: 16px; font-weight: 700; letter-spacing: .06em; text-align: center; text-decoration: none; cursor: pointer; border-radius: 6px; border: 2px solid var(--ink); background: var(--ink); color: #fff; transition: transform .06s; }
+  .btn:active { transform: translateY(2px); }
+  .btn.accent { background: var(--accent); border-color: var(--accent); }
+  .btn.ghost { background: transparent; color: var(--ink); margin-top: 10px; font-weight: 500; font-size: 14.5px; padding: 14px; }
+  .btn.line { background: var(--line-green); border-color: var(--line-green); }
+  .note { font-size: 12px; color: var(--sub); text-align: center; margin-top: 14px; line-height: 1.8; }
+
+  /* ===== PLAY ===== */
+  .bar { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; }
+  .qno { font-family: var(--serif); font-weight: 900; font-size: 18px; }
+  .qno small { font-family: var(--sans); font-weight: 500; font-size: 13px; color: var(--sub); }
+  .tally { font-size: 12px; color: var(--sub); display: flex; gap: 5px; align-items: center; }
+  .tally i { width: 9px; height: 9px; border: 1.5px solid var(--ink); display: inline-block; }
+  .tally i.ok { background: var(--ok); border-color: var(--ok); } .tally i.ng { background: var(--accent); border-color: var(--accent); }
+  .help { font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--ink); background: transparent; border: 1.5px solid var(--ink); border-radius: 4px; padding: 3px 10px; cursor: pointer; }
+  .badge-p { display: inline-block; background: var(--accent); color: #fff; font-family: var(--sans); font-size: 11px; font-weight: 900; padding: 2px 8px; margin-left: 8px; letter-spacing: .06em; vertical-align: 2px; }
+  .backdrop { position: fixed; inset: 0; background: rgba(29,29,27,.45); z-index: 35; opacity: 0; visibility: hidden; transition: opacity .2s, visibility 0s .2s; }
+  .backdrop.show { opacity: 1; visibility: visible; transition: opacity .2s; }
+  .help-sheet { z-index: 45; max-height: 88vh; overflow-y: auto; }
+  .timer { height: 4px; background: var(--rule); margin-bottom: 22px; }
+  .timer > div { height: 100%; width: 100%; background: var(--ink); transform-origin: left; }
+  .timer > div.low { background: var(--accent); }
+
+  .scene { font-size: 12px; color: var(--sub); font-weight: 700; letter-spacing: .04em; margin-bottom: 8px; }
+  .quote { font-family: var(--serif); font-weight: 900; font-size: 22px; line-height: 1.7; padding-left: 14px; border-left: 4px solid var(--ink); margin-bottom: 26px; animation: fadeIn .35s ease; }
+  .ask { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+
+  .stairs { display: flex; flex-direction: column; gap: 7px; }
+  .step { position: relative; display: flex; align-items: stretch; width: calc(100% - var(--ml)); margin-left: var(--ml); background: var(--paper-2); border: 2px solid var(--ink); border-radius: 6px; cursor: pointer; text-align: left; font-family: var(--sans); color: var(--ink); overflow: hidden; transition: transform .06s; }
+  .step:active { transform: translateY(2px); }
+  .step .n { flex: 0 0 46px; display: grid; place-items: center; background: var(--ink); color: #fff; font-family: var(--serif); font-weight: 900; font-size: 20px; }
+  .step .txt { padding: 9px 12px; flex: 1; }
+  .step .t { font-weight: 900; font-size: 16px; line-height: 1.3; }
+  .step .d { font-size: 12px; color: var(--sub); margin-top: 1px; line-height: 1.4; }
+  .step .tag { align-self: center; padding-right: 12px; font-size: 12px; font-weight: 900; display: none; }
+  .step.locked { pointer-events: none; }
+  .step.wait { opacity: .55; }
+  .step.dim { opacity: .35; }
+  .step.right { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .step.right .n { background: rgba(0,0,0,.25); }
+  .step.right .d { color: rgba(255,255,255,.85); }
+  .step.right .tag { display: block; }
+  .step.wrong { border-color: var(--accent); }
+  .step.wrong .n { background: var(--accent); }
+  .step.wrong .tag { display: block; color: var(--accent); }
+
+  .sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: var(--paper-2); border-top: 2px solid var(--ink); transform: translateY(105%); visibility: hidden; transition: transform .25s ease, visibility 0s .25s; }
+  .sheet.show { transform: none; visibility: visible; transition: transform .25s ease, visibility 0s; }
+  .sheet-in { max-width: 520px; margin: 0 auto; padding: 16px 20px calc(16px + env(safe-area-inset-bottom)); }
+  .verdict { font-family: var(--serif); font-weight: 900; font-size: 24px; line-height: 1.3; margin-bottom: 6px; }
+  .verdict.ok { color: var(--ok); } .verdict.near, .verdict.far { color: var(--accent); } .verdict.time { color: var(--sub); }
+  .why { font-size: 14px; line-height: 1.85; color: #3A372F; margin-bottom: 14px; }
+  .why b { font-weight: 900; color: var(--ink); }
+
+  /* ===== RESULT ===== */
+  .r-label { font-size: 12px; font-weight: 700; letter-spacing: .14em; color: var(--sub); margin: 6px 0 4px; }
+  .r-score { font-family: var(--serif); font-weight: 900; font-size: 72px; line-height: 1.1; }
+  .r-score small { font-size: 22px; font-weight: 600; margin-left: 4px; }
+  .recap { margin: 16px 0 26px; border-top: 2px solid var(--ink); }
+  .recap div { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: 13.5px; }
+  .recap .q { font-family: var(--serif); font-weight: 900; width: 30px; }
+  .recap .a { flex: 1; color: #3A372F; }
+  .recap .a b { font-weight: 900; color: var(--ink); }
+  .recap .m { font-weight: 900; width: 70px; text-align: right; }
+  .recap .m.ok { color: var(--ok); } .recap .m.ng { color: var(--accent); } .recap .m.to { color: var(--sub); }
+
+  .sec-label { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--sub); margin-bottom: 10px; }
+  .gauge { position: relative; height: 2px; background: var(--ink); margin: 18px 6px 8px; }
+  .gauge i { position: absolute; top: -4px; width: 2px; height: 10px; background: var(--ink); }
+  .gauge .pin { position: absolute; top: 50%; left: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px; background: var(--accent); border: 2px solid var(--paper); outline: 2px solid var(--accent); transition: left 1s cubic-bezier(.3,1,.4,1); }
+  .gauge-lbl { display: flex; justify-content: space-between; font-size: 12px; color: var(--sub); margin: 0 0 18px; }
+  .gauge-lbl b { color: var(--ink); }
+  .res-h { font-family: var(--serif); font-weight: 900; font-size: 22px; line-height: 1.55; margin-bottom: 8px; }
+  .res-p { font-size: 14.5px; line-height: 1.95; color: #3A372F; }
+  .res-p b { font-weight: 900; color: var(--ink); }
+  .block { padding: 24px 0; border-top: 1px solid var(--rule); margin-top: 24px; }
+  .block .res-h { font-size: 19px; }
+
+  .toast { position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 12px); opacity: 0; background: var(--ink); color: #fff; font-weight: 700; font-size: 13px; padding: 10px 16px; border-radius: 4px; z-index: 80; transition: all .25s; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  .foot { text-align: center; color: var(--sub); font-size: 12px; margin-top: 26px; }
+  @media (max-height: 700px) { .quote { font-size: 19px; margin-bottom: 18px; } .step .txt { padding: 6px 12px; } }
+
+  /* ===== 二択 ===== */
+  .who { font-size: 12px; font-weight: 700; color: var(--sub); letter-spacing: .06em; margin-bottom: 8px; }
+  .who.rep { margin-top: 4px; }
+  .opts { display: flex; flex-direction: column; gap: 10px; }
+  .opt { position: relative; display: flex; align-items: stretch; width: 100%; background: var(--paper-2); border: 2px solid var(--ink); border-radius: 6px; cursor: pointer; text-align: left; font-family: var(--sans); color: var(--ink); overflow: hidden; transition: transform .06s; }
+  .opt:active { transform: translateY(2px); }
+  .opt .n { flex: 0 0 44px; display: grid; place-items: center; background: var(--ink); color: #fff; font-family: var(--serif); font-weight: 900; font-size: 20px; }
+  .opt .txt { padding: 12px 14px; flex: 1; font-size: 16px; font-weight: 700; line-height: 1.6; }
+  .opt .tag { align-self: center; padding-right: 12px; font-size: 12px; font-weight: 900; display: none; white-space: nowrap; }
+  .opt.locked { pointer-events: none; }
+  .opt.wait { opacity: .55; }
+  .opt.dim { opacity: .4; }
+  .opt.right { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .opt.right .n { background: rgba(0,0,0,.25); }
+  .opt.right .tag { display: block; }
+  .opt.wrong { border-color: var(--accent); }
+  .opt.wrong .n { background: var(--accent); }
+  .opt.wrong .tag { display: block; color: var(--accent); }
+  .state { margin: 0 0 14px; padding: 8px 12px; border-left: 3px solid var(--ink); background: #EDE8DD; font-size: 13px; line-height: 1.7; }
+  .stairs-box { margin: 6px 0 4px; }
+  .stairs-box .legend { margin: 12px 0 0; }
+  .cta-lead { margin: 6px 0 12px; font-family: 'Noto Serif JP', serif; font-weight: 600; font-size: 17px; line-height: 1.7; color: var(--ink); }
+  .cta-lead b { font-weight: 900; }
+  .state .stg { display: block; margin-bottom: 3px; font-weight: 900; font-size: 12px; letter-spacing: .06em; color: var(--accent); }
+</style></head>
+<body>
+
+<!-- 開始数・完了数・診断への遷移数だけを数える非表示フォーム（Netlify Forms）。個人情報は送らない。段当てゲームと同じ game-event を使う（detailに game=nitaku を入れて区別） -->
+<form name="game-event" method="POST" data-netlify="true" hidden>
+  <input type="text" name="event">
+  <input type="text" name="detail">
+  <input type="text" name="ref">
+</form>
+
+<div class="container">
+
+  <!-- ================= TITLE ================= -->
+  <div class="screen active" id="screen-title">
+    <div class="head">
+      <div>
+        <div class="brand">脳内 HACK SALES</div>
+        <div class="meta">全5問 ／ 約90秒 ／ 登録なし</div>
+      </div>
+      <svg class="stair-mark" viewBox="0 0 54 40" aria-hidden="true">
+        <path d="M1 39h10V31h10V23h10V15h10V7h12V1" fill="none" stroke="#1D1D1B" stroke-width="2.5" stroke-linejoin="miter"/>
+        <rect x="42" y="1" width="11" height="6" fill="#D0391E"/>
+      </svg>
+    </div>
+    <div class="from-badge" id="fromBadge"></div>
+    <h1>どっちが、<br>営業できてる？</h1>
+    <div class="lead">営業って、意外とこんなゲーム。</div>
+    <p class="desc">お客さんのひとことに、営業マンが2通りで返す。<b>営業できてるほう</b>を選ぶだけ。営業をやったことがなくても、なんとなくで遊べる。答えを見ると、意外と理由がある。その理由が、<b>「感情の階段」</b>。</p>
+
+    <button class="btn accent" id="startBtn">はじめる</button>
+    <p class="note">ログイン・入力は不要。スマホでそのまま遊べる。<br>脳内Hack Sales 主宰・わき 監修</p>
+  </div>
+
+  <!-- ================= PLAY ================= -->
+  <div class="screen" id="screen-play">
+    <div class="bar">
+      <div class="qno" id="qno">1 <small>/ 5</small></div>
+      <div class="tally" id="tally"></div>
+    </div>
+    <div class="timer"><div id="timerFill"></div></div>
+
+    <div class="scene" id="scene"></div>
+    <div class="who">お客さん</div>
+    <div class="quote" id="quote"></div>
+
+    <div class="who rep">営業マンの返し。どっちが、営業できてる？</div>
+    <div class="opts" id="opts"></div>
+  </div>
+
+  <div class="sheet" id="sheet">
+    <div class="sheet-in">
+      <div class="verdict" id="verdict"></div>
+      <div class="state" id="state"></div>
+      <div class="why" id="why"></div>
+      <button class="btn" id="nextBtn">次へ</button>
+    </div>
+  </div>
+
+  <!-- ================= RESULT ================= -->
+  <div class="screen" id="screen-result">
+    <div class="r-label">RESULT</div>
+    <div class="r-score"><span id="resExact">0</span><small>/ 5 営業できてる</small></div>
+    <div class="recap" id="recap"></div>
+
+    <div id="gaugeBox">
+    <div class="sec-label">あなたが外しやすい方向</div>
+    <div class="gauge"><i style="left:0"></i><i style="left:50%"></i><i style="right:0"></i><div class="pin" id="gaugePin"></div></div>
+    <div class="gauge-lbl"><span>くどい</span><b>ぴったり</b><span>売り込み</span></div>
+    </div>
+    <h2 class="res-h" id="dirTitle"></h2>
+    <p class="res-p" id="dirBody"></p>
+
+    <div class="block">
+      <h2 class="res-h">いまの5問は、ぜんぶ「感情の階段」の問題。</h2>
+      <p class="res-p">相手の気持ちは、1段ずつしか上がらない。これを、脳内Hack Salesでは<b>「感情の階段」</b>と呼んでる。相手がいま何段目かを見て、<b>1段だけ上げる</b>。飛ばさない。<br>失注の理由は「高かった」「機能が足りなかった」と言われるけど、ほとんどは<b>段の読み間違い</b>。<br>いまの正解は、どれも「いまの段を見て、1段だけ上げる」返しだった。見分けるのは、セリフそのものより「何の話をしてるか」（話題）。</p>
+      <div class="legend stairs-box" id="resLegend"></div>
+      <p class="res-p" style="font-size:12px;color:var(--sub);margin-top:8px">階段には、この手前に0段目「不認知」（まだ出会っていない）、先に6段目「紹介・ファン化」（買ったあと）もある。今回は、商談で扱う1〜5段目。</p>
+    </div>
+
+    <div class="block" style="margin-top:0">
+      <h2 class="res-h">営業の外でも、同じ。</h2>
+      <p class="res-p">上司に企画を通す。同僚に頼みごとをする。取引先と交渉する。どれも、相手がいま何段目にいるかで、通りやすさが変わる。<br><br>営業は、意外とこういうゲーム。難しい話じゃない。ここを突き詰めた人から、仕事での価値が上がっていく。</p>
+    </div>
+
+    <div class="cta-lead" id="ctaLead"></div>
+    <a class="btn line" id="lineBtn" target="_blank" rel="noopener">公式LINEで、"型"の診断を受け取る</a>
+    <button class="btn ghost" id="replayBtn">もう一回やる（問題は毎回変わる）</button>
+    <a class="btn ghost" id="otherBtn" href="https://fantastic-chaja-6383fb.netlify.app/game/" style="display:block;text-decoration:none">次のゲーム：お客さんの"段"を当てる</a>
+    <button class="btn ghost" id="shareBtn">友だち・同僚にも送る</button>
+    <p class="foot">脳内Hack Sales 主宰・わき 監修</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ==================== CONFIG ====================
+const LINE_URL = "https://s.lmes.jp/landing-qr/1657797570-2Dj9r0mz?uLand=Wp8HKi";
+const GAME_URL = "https://fantastic-chaja-6383fb.netlify.app/game/nitaku/";
+const TIME_LIMIT = 15000; // 1問あたり15秒
+const urlParams = new URLSearchParams(window.location.search);
+const refParam = urlParams.get('ref') || '';
+const fromDiag = urlParams.get('from') === 'diag';
+const diagType = urlParams.get('type') || '';
+
+// ==================== EVENT LOG (Netlify Forms) ====================
+function track(eventName, detail) {
+  try {
+    const body = new URLSearchParams({
+      'form-name': 'game-event',
+      event: eventName,
+      detail: 'game=nitaku' + (detail ? ';' + detail : ''),
+      ref: (fromDiag ? 'diag' : (refParam ? 'ref' : ''))
+    });
+    fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString(),
+      keepalive: true
+    }).catch(() => {});
+  } catch (e) {}
+}
+
+// ==================== DATA ====================
+// 出典：脳内Hack Sales 第4回「相手をハックする」p17（段の名前）・p19（話題と状態）・p16/p23（失注は段の読み間違い／迷ったら低く置く）
+const STAGES = {
+  1: { t: '無関心',     topic: 'いまのまま', d: '問題として見えていない。いまのままで回っている' },
+  2: { t: '不満・不安', topic: '困りごと',   d: '問題には気づいた。でも、まだ動くほどではない' },
+  3: { t: '欲求・関心', topic: '方法',       d: 'なんとかしたい。方法を探しはじめた' },
+  4: { t: '解決策',     topic: '比較',       d: '解決する前提で、やり方や相手を比べている' },
+  5: { t: '決断・購入', topic: '社内',       d: '買う前提で、社内の通し方を気にしている' }
+};
+const TAG = { over: '売り込み', under: 'くどい' }; // over=段を飛ばした（売り込み）／under=段を戻した（くどい）
+
+// st=お客さんがいる段, good=段を1つ上げる返し, bad=ズレた返し, bt=ズレの向き
+const POOL = [
+  { scene: '提案の終わりに', line: 'いいですね。資料だけいただけますか？ あとで見ておきます。', st: 1,
+    good: 'お送りします。ちなみに、いまのやり方だと、月にどれくらい手間がかかってますか？',
+    bad: 'ありがとうございます。では来週、見積もりを持ってお伺いしますね', bt: 'over',
+    state: 'お客さんの話題は「いまのまま」。まだ、問題として見えていない。',
+    why: '1段目の人に見積もりを出すのは、段を飛ばした売り込み。まず<b>件数や手間を、相手に数えさせる</b>。数字はこちらの意見じゃないから、反論されない。' },
+  { scene: '電話の最後に', line: 'なるほど。また何かあったら、こちらから連絡しますね。', st: 1,
+    good: 'ぜひ。次回、同じ状況の会社の数字を1枚にまとめて、お持ちしてもいいですか？',
+    bad: 'では、こちらから来週あらためてご連絡して、詳しくご説明しますね', bt: 'over',
+    state: 'お客さんの話題は「いまのまま」。まだ、問題として見えていない。',
+    why: '1段目でやることは、<b>売らずに、会う理由をつくる</b>だけ。詳しい説明を足すと、売り込みになる。' },
+  { scene: '雑談のなかで', line: '正直、最近ちょっと現場がバタついてて…。まあ、なんとかしてますけど。', st: 2,
+    good: 'このまま2年続いたら、どのあたりがいちばんしんどくなりそうですか？',
+    bad: 'それなら、うちのサービスで解決できます。導入事例をご説明しますね', bt: 'over',
+    state: 'お客さんの話題は「困りごと」。気づいてはいるけど、まだ動くほどじゃない。',
+    why: '2段目の人に解決策を出すと、段を飛ばした売り込みになる。やることは、<b>このままの将来を、相手の口から言わせる</b>こと。' },
+  { scene: '打ち合わせの合間に', line: '前の担当の人が辞めてから、ちょっと不安なんですよね。', st: 2,
+    good: 'それ、どうにかしたいと思われたこと、ありますか？',
+    bad: 'そうなんですね。何かあれば、いつでもご連絡ください', bt: 'under',
+    state: 'お客さんの話題は「困りごと」。不安を、自分から口に出した。',
+    why: '「不安」と自分から言った。ここで引くと、段が上がらない。<b>「どうにかしたい」かどうか</b>を聞いて、3段目へ上げる。' },
+  { scene: '2回目の訪問で', line: '他の会社さんは、どうやって解決してるんですか？', st: 3,
+    good: 'いま、ほかにどんな方法をご覧になってますか？ 譲れない条件があれば、先に伺いたいです',
+    bad: '御社の課題を、もう少し詳しく教えてもらえますか？', bt: 'under',
+    state: 'お客さんの話題は「方法」。なんとかしたくて、方法を探しはじめた。',
+    why: '課題はもう出てる。同じことをまた聞くと、<b>くどい</b>。3段目から4段目へは、手段選びの質問で上げる。' },
+  { scene: '提案の途中で', line: 'それ、うちの場合だと、何がどう変わるんですか？', st: 3,
+    good: 'もし変えるとしたら、どんな状態になっていたら理想ですか？ 御社の言葉で教えてください',
+    bad: 'ご契約いただければ、来月から始められます', bt: 'over',
+    state: 'お客さんの話題は「方法」。自分ごととして考えはじめた。',
+    why: '3段目は、まだ商品を出す段じゃない。やることは、<b>理想を、相手の言葉で</b>言ってもらうこと。契約の話は、段を2つ飛ばしてる。' },
+  { scene: '見積もりを出したあと', line: 'A案とB案、費用と導入までの期間でどう違いますか？', st: 4,
+    good: '費用はA案が安く、導入はB案が早いです。優先したいのは、どちらですか？',
+    bad: 'A案がおすすめです。今月中なら特典もつけられます', bt: 'over',
+    state: 'お客さんの話題は「比較」。解決する前提で、やり方を比べてる。',
+    why: '比べてる人に必要なのは、<b>違いと、選ぶ基準</b>。特典で押すと、段を飛ばして売り込みになる。' },
+  { scene: '商談の後半で', line: '他社の見積もりも取ってるんですけど、御社の強みって何ですか？', st: 4,
+    good: '正直、価格はA社さんが強いです。一方で、この3点は弊社が強いです。重視されるのは、どれですか？',
+    bad: 'まず、弊社がどんな会社か、あらためてご説明させてください', bt: 'under',
+    state: 'お客さんの話題は「比較」。もう他社と比べてる。',
+    why: '比べてる人に会社説明からやり直すと、<b>くどい</b>。弱みを先に出して、違いを端的に言う。そのほうが、信用される。' },
+  { scene: '商談のおわりに', line: '私は良いと思うんですが、部長にどう説明すればいいか…。', st: 5,
+    good: '部長に出す資料を、1枚作ります。いちばん気にされそうな点は、どこでしょうか？',
+    bad: 'では、部長さんも一緒に、もう一度ゼロから課題を整理しましょうか', bt: 'under',
+    state: 'お客さんの話題は「社内」。買う前提で、社内の通し方を気にしてる。',
+    why: '5段目の人にゼロから整理し直すと、<b>くどい</b>。やることは、<b>購入の不安を、1つずつ取る</b>こと。社内を通す材料を渡す。' },
+  { scene: '最終の打ち合わせで', line: '条件は問題ないです。あとは稟議の書き方を教えてもらえますか。', st: 5,
+    good: '稟議用に、導入理由と費用対効果をまとめた資料をお渡しします。通すときに止まりそうなのは、どこですか？',
+    bad: 'ありがとうございます。念のため、他社さんとの比較資料もお送りしましょうか？', bt: 'under',
+    state: 'お客さんの話題は「社内」。買う前提で、通し方を聞いてきた。',
+    why: '買う前提の人に比較資料を足すと、4段目に引き戻す。<b>くどい</b>。稟議に必要なものを、すぐ渡す。' }
+  ,{ scene: '電話をかけて、最初の10秒で', line: 'うち、間に合ってるので。', st: 1,
+    good: 'そうですよね。売り込みではなく、同業の数字を1枚だけ見てもらえませんか？ 5分で済みます',
+    bad: '間に合ってるとのことですが、弊社なら半額でご提供できます', bt: 'over',
+    state: 'お客さんの話題は「いまのまま」。まだ、問題として見えていない。',
+    why: '1段目の人に価格で攻めるのは、段を飛ばした売り込み。やることは、<b>売らずに、会う理由をつくる</b>こと。' },
+  { scene: 'ヒアリングの途中で', line: '言われてみれば、たしかに、そこは前から気になってたんですよね。', st: 2,
+    good: 'もし変えるとしたら、何からになりそうですか？',
+    bad: 'なるほど。念のため、御社の現状から、もう一度最初に伺ってもいいですか？', bt: 'under',
+    state: 'お客さんの話題は「困りごと」。気づいていたけど、動くほどじゃなかった。',
+    why: '気になっていたと、自分から認めた。ここで最初に戻ると、<b>くどい</b>。「変えるなら何から」と聞いて、3段目へ上げる。' },
+  { scene: '打ち合わせの終盤に', line: 'ここまで聞いて、やっぱり何とかしたいなと思いました。どうすればいいんですか？', st: 3,
+    good: 'ありがとうございます。譲れない条件はありますか？ それを聞いてから、選択肢を並べます',
+    bad: 'では、弊社のプランをご案内します。今月中のお申し込みなら、特典がつきます', bt: 'over',
+    state: 'お客さんの話題は「方法」。なんとかしたくて、方法を探しはじめた。',
+    why: '3段目は、まだ申し込みの段じゃない。<b>条件を聞いて、手段選びに進める</b>。特典で急かすと、段を飛ばす。' },
+  { scene: '2社で迷っている商談で', line: 'A社さんのほうが安いんですが、御社に頼む理由って何ですか？', st: 4,
+    good: '価格はA社さんが安いです。それでも弊社を選ぶ方が多いのは、この2点が違うからです。どちらが大事ですか？',
+    bad: 'では、あらためて、御社の課題を最初から伺ってもよろしいですか？', bt: 'under',
+    state: 'お客さんの話題は「比較」。もうA社と比べている。',
+    why: '比べている人に課題を聞き直すと、<b>くどい</b>。弱みを先に認めて、違いを2つに絞る。' },
+  { scene: '商談の終わりに', line: '条件はこれで大丈夫そうです。上に出す資料、もらえます？', st: 5,
+    good: 'お作りします。上の方が引っかかりそうな点があれば、先に教えてもらえますか？ そこを資料に入れます',
+    bad: 'ありがとうございます。今日決めていただけたら、10%お値引きします', bt: 'over',
+    state: 'お客さんの話題は「社内」。買う前提で、社内の通し方を気にしている。',
+    why: '5段目の人に値引きで押すのは、売り込み。やることは、<b>購入の不安を、1つずつ取る</b>こと。' }
+];
+
+// ==================== HELPERS ====================
+const $ = id => document.getElementById(id);
+function show(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $('screen-' + name).classList.add('active');
+  window.scrollTo(0, 0);
+}
+function toast(msg) {
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+function vib(p) { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
+const seenQ = new Set();
+function pickQuestions() {
+  // 前に出していない問題を先に使う（もう一回やっても、なるべく別の問題が出る）
+  const pool = POOL.map((q, i) => ({ q, i })).sort(() => Math.random() - .5)
+    .sort((a, b) => (seenQ.has(a.i) ? 1 : 0) - (seenQ.has(b.i) ? 1 : 0));
+  const picked = [], cnt = {};
+  for (const o of pool) {
+    if ((cnt[o.q.st] || 0) >= 2) continue;
+    picked.push(o); cnt[o.q.st] = (cnt[o.q.st] || 0) + 1;
+    if (picked.length === 5) break;
+  }
+  picked.forEach(o => seenQ.add(o.i));
+  if (seenQ.size > POOL.length - 5) seenQ.clear();
+  return picked.map(o => o.q).sort(() => Math.random() - .5);
+}
+function fillLegend(box) {
+  box.innerHTML = '';
+  [1, 2, 3, 4, 5].forEach(n => {
+    const d = document.createElement('div');
+    d.innerHTML = '<b>' + n + '段目</b><div><em>' + STAGES[n].t + '</em><span>話題＝' + STAGES[n].topic + '。' + STAGES[n].d + '</span></div>';
+    box.appendChild(d);
+  });
+}
+
+// ==================== TITLE ====================
+(function initTitle() {
+  if (fromDiag) {
+    const b = $('fromBadge');
+    b.style.display = 'block';
+    b.textContent = (diagType ? '診断おつかれさま（' + diagType + '）。' : '診断おつかれさま。') + 'こんどは、どっちが営業できてるかを選ぶゲーム。自分の型と見比べながらやってみて。';
+  }
+})();
+
+// ==================== GAME STATE ====================
+let Q = [], idx = 0, results = [], timerRaf = null, timerStart = 0, locked = true, qToken = 0, cur = null;
+
+$('startBtn').addEventListener('click', startGame);
+function startGame() {
+  Q = pickQuestions(); idx = 0; results = [];
+  track('game_start', fromDiag ? 'from_diag' : '');
+  show('play');
+  showQuestion();
+}
+
+function renderTally() {
+  const t = $('tally'); t.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const d = document.createElement('i');
+    const r = results[i];
+    if (r) d.className = r.kind === 'ok' ? 'ok' : 'ng';
+    t.appendChild(d);
+  }
+}
+
+function showQuestion() {
+  const q = Q[idx], tok = ++qToken;
+  cur = q;
+  $('sheet').classList.remove('show');
+  $('qno').innerHTML = (idx + 1) + ' <small>/ 5</small>';
+  renderTally();
+  $('scene').textContent = 'シーン：' + q.scene;
+  $('quote').textContent = '「' + q.line + '」';
+  // A/Bの並びをランダムに
+  const goodFirst = Math.random() < 0.5;
+  q.order = goodFirst ? ['good', 'bad'] : ['bad', 'good'];
+  const box = $('opts'); box.innerHTML = '';
+  q.order.forEach((key, i) => {
+    const b = document.createElement('button');
+    b.className = 'opt locked wait'; b.dataset.key = key;
+    b.innerHTML = '<span class="n">' + 'AB'[i] + '</span><span class="txt">「' + q[key] + '」</span><span class="tag"></span>';
+    b.addEventListener('click', () => answer(key));
+    box.appendChild(b);
+  });
+  locked = true;
+  const readMs = Math.min(1400, 500 + (q.line.length + q.good.length) * 10);
+  $('timerFill').style.transform = 'scaleX(1)'; $('timerFill').classList.remove('low');
+  setTimeout(() => {
+    if (tok !== qToken) return;
+    document.querySelectorAll('.opt').forEach(s => s.classList.remove('locked', 'wait'));
+    locked = false; startTimer();
+  }, readMs);
+}
+
+function startTimer() {
+  const fill = $('timerFill');
+  timerStart = performance.now();
+  cancelAnimationFrame(timerRaf);
+  const loop = now => {
+    const left = Math.max(0, 1 - (now - timerStart) / TIME_LIMIT);
+    fill.style.transform = 'scaleX(' + left + ')';
+    if (left < .33) fill.classList.add('low');
+    if (left <= 0) { timeUp(); return; }
+    timerRaf = requestAnimationFrame(loop);
+  };
+  timerRaf = requestAnimationFrame(loop);
+}
+function stopTimer() { cancelAnimationFrame(timerRaf); }
+function lockAll() { document.querySelectorAll('.opt').forEach(s => s.classList.add('locked')); }
+
+function answer(key) {
+  if (locked) return;
+  locked = true; stopTimer(); lockAll();
+  const q = cur, ok = key === 'good';
+  results.push({ q, kind: ok ? 'ok' : 'ng', pick: 'AB'[q.order.indexOf(key)], right: 'AB'[q.order.indexOf('good')], dir: ok ? null : q.bt });
+  document.querySelectorAll('.opt').forEach(s => {
+    const k = s.dataset.key, tag = s.querySelector('.tag');
+    if (k === 'good') { s.classList.add('right'); tag.textContent = '営業できてる'; }
+    else if (k === key) { s.classList.add('wrong'); tag.textContent = TAG[q.bt]; }
+    else s.classList.add('dim');
+  });
+  vib(ok ? 25 : [35, 25, 35]);
+  renderTally();
+  openSheet(ok ? 'できてる。' : (TAG[q.bt] + '。'), ok ? 'ok' : 'far', q);
+}
+function timeUp() {
+  if (locked) return;
+  locked = true; lockAll();
+  const q = cur;
+  results.push({ q, kind: 'time', pick: null, right: 'AB'[q.order.indexOf('good')], dir: null });
+  document.querySelectorAll('.opt').forEach(s => {
+    if (s.dataset.key === 'good') { s.classList.add('right'); s.querySelector('.tag').textContent = '営業できてる'; }
+    else s.classList.add('dim');
+  });
+  renderTally();
+  openSheet('時間切れ。', 'time', q);
+}
+function openSheet(verdict, vcls, q) {
+  const v = $('verdict'); v.textContent = verdict; v.className = 'verdict ' + vcls;
+  $('state').innerHTML = '<span class="stg">感情の階段　' + q.st + '段目「' + STAGES[q.st].t + '」</span>' + q.state;
+  $('why').innerHTML = q.why;
+  $('nextBtn').textContent = idx === 4 ? '結果を見る' : '次のお客さん';
+  setTimeout(() => $('sheet').classList.add('show'), 250);
+}
+$('nextBtn').addEventListener('click', () => {
+  $('sheet').classList.remove('show');
+  if (idx === 4) { setTimeout(showResult, 200); return; }
+  idx++; setTimeout(showQuestion, 200);
+});
+
+// ==================== RESULT ====================
+let lastDirection = '';
+function showResult() {
+  $('sheet').classList.remove('show'); stopTimer();
+  const exact = results.filter(r => r.kind === 'ok').length;
+  const over = results.filter(r => r.dir === 'over').length;
+  const under = results.filter(r => r.dir === 'under').length;
+  const net = over - under;
+
+  const misses = over + under;
+  let dir, title, body;
+  if (exact === 5) {
+    dir = 'perfect'; title = '5問ぜんぶ、営業できてる。';
+    body = '相手のセリフから、いま何段目かを読めてる。次は、読んだ相手に<b>どう動くか</b>。同じ読みでも、動き方の得意・不得意は人によって違う。自分の"型"を知ると、そこがはっきりする。';
+  } else if (misses <= 1) {
+    dir = 'near';
+    title = exact >= 4 ? '惜しい。ほぼ読めてる。' : '時間が足りんかっただけかも。';
+    if (misses === 1) {
+      const d = over === 1 ? '売り込み' : 'くどい';
+      body = '外したのは1問だけ。その1問は「' + d + '」のほう。<b>1問だけなら、クセとは言えない。</b>もう一回やって、同じ外し方が出るか見てみて。';
+    } else {
+      body = '間違えたというより、時間切れが多かった。相手の言葉を読むのは、慣れると速くなる。<b>もう一回やってみて。</b>';
+    }
+  } else if (over > under) {
+    dir = 'over'; title = '売り込みになりやすい。';
+    body = '相手の段を飛ばして、先に出してしまってる。資料、見積もり、クロージング。<b>実際より高く見積もるのが、いちばん多い失敗。</b>迷ったら、低いほうに置いて、1段だけ上げる。';
+  } else if (under > over) {
+    dir = 'under'; title = 'くどくなりやすい。';
+    body = '相手がもう上がってるのに、前の段の話をくり返してる。質問を重ねたり、説明をやり直したり。丁寧なぶん、<b>くどい</b>。相手のセリフから、いまの段を見直して、1段だけ上げる。';
+  } else {
+    dir = 'mixed'; title = '売り込みと、くどいが、両方ある。';
+    body = '段を飛ばす時もあれば、戻る時もあった。相手の言葉より、<b>自分の気分</b>で動いてる。「相手がいま何段目か」を基準にすると、安定する。';
+  }
+  lastDirection = dir;
+
+  const rc = $('recap'); rc.innerHTML = '';
+  results.forEach((r, i) => {
+    const d = document.createElement('div');
+    let m, cls;
+    if (r.kind === 'ok') { m = 'できてる'; cls = 'ok'; }
+    else if (r.kind === 'time') { m = '時間切れ'; cls = 'to'; }
+    else { m = TAG[r.dir]; cls = 'ng'; }
+    const you = r.pick ? 'あなた <b>' + r.pick + '</b>' : 'あなた <b>—</b>';
+    d.innerHTML = '<span class="q">Q' + (i + 1) + '</span><span class="a">' + you + ' ／ 正解 <b>' + r.right + '</b><br><small style="color:var(--sub)">お客さん＝' + r.q.st + '段目「' + STAGES[r.q.st].t + '」</small></span><span class="m ' + cls + '">' + m + '</span>';
+    rc.appendChild(d);
+  });
+
+  $('dirTitle').textContent = title; $('dirBody').innerHTML = body;
+  fillLegend($('resLegend'));
+  show('result');
+  countUp($('resExact'), exact, 600);
+  const pos = Math.max(4, Math.min(96, 50 + (net / 5) * 46));
+  $('gaugeBox').style.display = (dir === 'near') ? 'none' : 'block';
+  setTimeout(() => { $('gaugePin').style.left = pos + '%'; }, 300);
+
+  const LEADS = {
+    perfect: '読めてる人が、次に磨くところがある。<b>あなたの"型"の診断を、公式LINEで。</b>',
+    near:    'ほぼ読めてる人の、あと一歩。<b>あなたの"型"の診断を、公式LINEで。</b>',
+    over:    '売り込みになりやすい人が、段を飛ばさず、1段だけ上げるコツは、型ごとに違う。<b>あなたの"型"の診断を、公式LINEで。</b>',
+    under:   'くどくなりやすい人が、1段だけ上げて、前に進めるコツは、型ごとに違う。<b>あなたの"型"の診断を、公式LINEで。</b>',
+    mixed:   '相手の段で動くコツは、型ごとに違う。<b>あなたの"型"の診断を、公式LINEで。</b>'
+  };
+  if (fromDiag) {
+    $('ctaLead').innerHTML = '診断の結果に、このゲームの結果を重ねて見ると、動き方がはっきりする。<b>自分の型の攻略法は、公式LINEで。</b>';
+    $('lineBtn').textContent = '公式LINEで、攻略法を受け取る';
+  } else {
+    $('ctaLead').innerHTML = LEADS[dir];
+  }
+  track('game_complete', 'dir=' + dir + ';exact=' + exact);
+}
+function countUp(el, to, ms) {
+  const t0 = performance.now();
+  const f = now => {
+    const p = Math.min(1, (now - t0) / ms);
+    el.textContent = Math.round(to * p);
+    if (p < 1) requestAnimationFrame(f);
+  };
+  requestAnimationFrame(f);
+}
+
+// ==================== CTAs ====================
+function replay() { track('replay', ''); $('gaugePin').style.left = '50%'; startGame(); }
+$('replayBtn').addEventListener('click', replay);
+$('lineBtn').href = LINE_URL;
+$('lineBtn').addEventListener('click', () => track('line_tap', 'dir=' + lastDirection));
+$('otherBtn').addEventListener('click', () => track('to_other_game', ''));
+$('shareBtn').addEventListener('click', async () => {
+  track('share', '');
+  const text = 'どっちが営業できてる？ 営業って、意外とこんなゲーム。5問・90秒。';
+  try {
+    if (navigator.share) { await navigator.share({ title: 'どっちが、営業できてる？', text, url: GAME_URL }); return; }
+  } catch (e) { return; }
+  try { await navigator.clipboard.writeText(text + ' ' + GAME_URL); toast('リンクをコピーしました'); }
+  catch (e) { toast(GAME_URL); }
+});
+</script>
+</body>
+</html>
