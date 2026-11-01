@@ -253,7 +253,7 @@ function track(eventName, detail) {
       'form-name': 'game-event',
       event: eventName,
       detail: detail || '',
-      ref: (fromDiag ? 'diag' : (refParam ? 'ref' : ''))
+      ref: (fromDiag ? 'diag' : refParam.replace(/[^a-zA-Z0-9_\-]/g, '').slice(0, 30))
     });
     fetch('/', {
       method: 'POST',
