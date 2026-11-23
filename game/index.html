@@ -54,8 +54,14 @@
   .btn.accent { background: var(--accent); border-color: var(--accent); }
   .btn.ghost { background: transparent; color: var(--ink); margin-top: 10px; font-weight: 500; font-size: 14.5px; padding: 14px; }
   .btn.line { background: var(--line-green); border-color: var(--line-green); }
-  .line-steps { margin: 4px 0 14px; padding: 10px 12px; font-size: 12.5px; line-height: 1.9; color: var(--sub, #6b6b6b); text-align: left; }
-  .line-steps b { color: var(--ink, #222); }
+  .line-steps { margin: 10px 0 16px; padding: 14px 14px 12px; border: 2px solid var(--ink); background: var(--paper-2); text-align: left; font-size: 14.5px; line-height: 1.8; color: var(--ink); }
+  .line-steps .ls-done { display: none; margin: -2px -2px 12px; padding: 11px 14px; background: var(--ink); color: #fff; font-weight: 700; font-size: 15px; line-height: 1.6; }
+  .line-steps.copied .ls-done { display: block; }
+  .line-steps .ls-title { font-weight: 900; font-size: 15px; margin-bottom: 6px; }
+  .line-steps ol { margin: 0; padding-left: 1.5em; }
+  .line-steps li { margin: 5px 0; }
+  .line-steps b { font-weight: 900; border-bottom: 2px solid var(--accent); }
+  .line-steps .ls-fallback { margin-top: 8px; font-size: 12.5px; color: var(--sub); }
   .note { font-size: 12px; color: var(--sub); text-align: center; margin-top: 14px; line-height: 1.8; }
 
   /* ===== PLAY ===== */
@@ -581,7 +587,8 @@ function lineKeyword() { return KW_BY_DIR[lastDirection] || 'ゲーム・ばら�
 function setLineGuide() {
   const kw = lineKeyword();
   $('lineBtn').textContent = '公式LINEで、この結果の見立てを受け取る';
-  $('lineSteps').innerHTML = '<b>①</b> 上のボタンを押す（「' + kw + '」を自動でコピーします）<br><b>②</b> 公式LINEを友だち追加（追加済みの人は、そのままトークへ）<br><b>③</b> トーク画面に貼り付けて送信（コピーできなかったら、「' + kw + '」と入力）<br><b>④</b> この結果の見立てが届きます';
+  $('lineSteps').classList.remove('copied');
+  $('lineSteps').innerHTML = '<div class="ls-done">コピーできた。LINEが開いたら、入力欄に貼り付けて、そのまま送信してください。</div><div class="ls-title">LINEでの受け取り方</div><ol><li>上のボタンを押すと、<b>「' + kw + '」</b>が自動でコピーされる</li><li>LINEが開いたら、公式LINEを友だち追加（追加済みの人は、そのままトークへ）</li><li>トークの入力欄を長押しして<b>貼り付け</b>、そのまま<b>送信</b></li><li>この結果の見立てが、すぐに返ってくる</li></ol><div class="ls-fallback">貼り付けできなかったときは、「' + kw + '」と入力して送ってください。</div>';
 }
 $('toDiagBtn').addEventListener('click', () => {
   track('to_diagnosis', 'dir=' + lastDirection);
@@ -592,7 +599,7 @@ $('replayBtn').addEventListener('click', replay);
 $('replayBtn2').addEventListener('click', replay);
 $('lineBtn').href = LINE_URL;
 $('lineBtn').addEventListener('click', () => {
-  try { if (navigator.clipboard) { navigator.clipboard.writeText(lineKeyword()).then(() => toast('「' + lineKeyword() + '」をコピーした。LINEのトークに貼り付けて送信'), () => {}); } } catch (e) {}
+  try { if (navigator.clipboard) { navigator.clipboard.writeText(lineKeyword()).then(() => { $('lineSteps').classList.add('copied'); toast('コピーした。LINEで貼り付けて、送信してください'); }, () => {}); } } catch (e) {}
   track('line_tap', 'dir=' + lastDirection);
 });
 $('shareBtn').addEventListener('click', async () => {
