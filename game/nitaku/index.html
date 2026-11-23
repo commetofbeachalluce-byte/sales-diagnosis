@@ -64,6 +64,8 @@
   .btn.accent { background: var(--accent); border-color: var(--accent); }
   .btn.ghost { background: transparent; color: var(--ink); margin-top: 10px; font-weight: 500; font-size: 14.5px; padding: 14px; }
   .btn.line { background: var(--line-green); border-color: var(--line-green); }
+  .line-steps { margin: 4px 0 14px; padding: 10px 12px; font-size: 12.5px; line-height: 1.9; color: var(--sub, #6b6b6b); text-align: left; }
+  .line-steps b { color: var(--ink, #222); }
   .note { font-size: 12px; color: var(--sub); text-align: center; margin-top: 14px; line-height: 1.8; }
 
   /* ===== PLAY ===== */
@@ -251,7 +253,8 @@
     </div>
 
     <div class="cta-lead" id="ctaLead"></div>
-    <a class="btn line" id="lineBtn" target="_blank" rel="noopener">公式LINEで、"型"の診断を受け取る</a>
+    <a class="btn line" id="lineBtn" target="_blank" rel="noopener">公式LINEで、この結果の見立てを受け取る</a>
+    <div class="line-steps" id="lineSteps"></div>
     <button class="btn ghost" id="replayBtn">もう一回やる（問題は毎回変わる）</button>
     <a class="btn ghost" id="otherBtn" href="https://fantastic-chaja-6383fb.netlify.app/game/" style="display:block;text-decoration:none">次のゲーム：お客さんの"段"を当てる</a>
     <button class="btn ghost" id="shareBtn">友だち・同僚にも送る</button>
@@ -586,18 +589,18 @@ function showResult() {
   setTimeout(() => { $('gaugePin').style.left = pos + '%'; }, 300);
 
   const LEADS = {
-    perfect: '読めてる人が、次に磨くところがある。<b>あなたの"型"の診断を、公式LINEで。</b>',
-    near:    'ほぼ読めてる人の、あと一歩。<b>あなたの"型"の診断を、公式LINEで。</b>',
-    over:    '売り込みになりやすい人が、段を飛ばさず、1段だけ上げるコツは、型ごとに違う。<b>あなたの"型"の診断を、公式LINEで。</b>',
-    under:   'くどくなりやすい人が、1段だけ上げて、前に進めるコツは、型ごとに違う。<b>あなたの"型"の診断を、公式LINEで。</b>',
-    mixed:   '相手の段で動くコツは、型ごとに違う。<b>あなたの"型"の診断を、公式LINEで。</b>'
+    perfect: '読めてる人が、次に磨くところがある。<b>この結果の見立てを、公式LINEで。</b>',
+    near:    'ほぼ読めてる人の、あと一歩。<b>この結果の見立てを、公式LINEで。</b>',
+    over:    '売り込みになりやすい人が、段を飛ばさず、1段だけ上げるコツがある。<b>この結果の見立てを、公式LINEで。</b>',
+    under:   'くどくなりやすい人が、1段だけ上げて、前に進めるコツがある。<b>この結果の見立てを、公式LINEで。</b>',
+    mixed:   '相手の段で動くコツがある。<b>この結果の見立てを、公式LINEで。</b>'
   };
   if (fromDiag) {
-    $('ctaLead').innerHTML = '診断の結果に、このゲームの結果を重ねて見ると、動き方がはっきりする。<b>自分の型の攻略法は、公式LINEで。</b>';
-    $('lineBtn').textContent = '公式LINEで、攻略法を受け取る';
+    $('ctaLead').innerHTML = '診断の結果に、このゲームの結果を重ねて見ると、動き方がはっきりする。<b>この結果の見立てを、公式LINEで。</b>';
   } else {
     $('ctaLead').innerHTML = LEADS[dir];
   }
+  setLineGuide();
   track('game_complete', 'dir=' + dir + ';exact=' + exact);
 }
 function countUp(el, to, ms) {
@@ -611,10 +614,20 @@ function countUp(el, to, ms) {
 }
 
 // ==================== CTAs ====================
+const KW_BY_DIR = { over: 'ゲーム・売り込み寄り', high: 'ゲーム・売り込み寄り', under: 'ゲーム・くどい寄り', low: 'ゲーム・くどい寄り', mixed: 'ゲーム・ばらばら', near: 'ゲーム・ほぼ読めた', perfect: 'ゲーム・読めてる' };
+function lineKeyword() { return KW_BY_DIR[lastDirection] || 'ゲーム・ばらばら'; }
+function setLineGuide() {
+  const kw = lineKeyword();
+  $('lineBtn').textContent = '公式LINEで、この結果の見立てを受け取る';
+  $('lineSteps').innerHTML = '<b>①</b> 上のボタンを押す（「' + kw + '」を自動でコピーします）<br><b>②</b> 公式LINEを友だち追加（追加済みの人は、そのままトークへ）<br><b>③</b> トーク画面に貼り付けて送信（コピーできなかったら、「' + kw + '」と入力）<br><b>④</b> この結果の見立てが届きます';
+}
 function replay() { track('replay', ''); $('gaugePin').style.left = '50%'; startGame(); }
 $('replayBtn').addEventListener('click', replay);
 $('lineBtn').href = LINE_URL;
-$('lineBtn').addEventListener('click', () => track('line_tap', 'dir=' + lastDirection));
+$('lineBtn').addEventListener('click', () => {
+  try { if (navigator.clipboard) { navigator.clipboard.writeText(lineKeyword()).then(() => toast('「' + lineKeyword() + '」をコピーした。LINEのトークに貼り付けて送信'), () => {}); } } catch (e) {}
+  track('line_tap', 'dir=' + lastDirection);
+});
 $('otherBtn').addEventListener('click', () => track('to_other_game', ''));
 $('shareBtn').addEventListener('click', async () => {
   track('share', '');
