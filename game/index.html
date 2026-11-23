@@ -139,6 +139,12 @@
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
   .foot { text-align: center; color: var(--sub); font-size: 12px; margin-top: 26px; }
   @media (max-height: 700px) { .quote { font-size: 19px; margin-bottom: 18px; } .step .txt { padding: 6px 12px; } }
+
+.present { margin: 0 0 16px; border: 2px solid var(--accent); background: #fff; text-align: left; color: var(--ink); }
+.present .pr-tag { background: var(--accent); color: #fff; font-weight: 900; font-size: 13px; letter-spacing: 0.08em; padding: 5px 14px; }
+.present .pr-h { font-weight: 900; font-size: 15px; line-height: 1.6; padding: 10px 14px 4px; }
+.present ul { margin: 0; padding: 2px 14px 12px 2.4em; font-size: 14.5px; line-height: 1.8; }
+.present li { margin: 2px 0; }
 </style>
 </head>
 <body>
@@ -234,6 +240,11 @@
     <div id="ctaLine" style="display:none;">
       <a class="btn line" id="lineBtn" target="_blank" rel="noopener">公式LINEで、この結果の見立てを受け取る</a>
       <div class="line-steps" id="lineSteps"></div>
+      <div class="present">
+        <div class="pr-tag">プレゼント配布中</div>
+        <div class="pr-h">登録すると、LINEのトーク画面の下にある「Present」から受け取れる。</div>
+        <ul><li>営業の本の超要約（30種類以上）</li><li>商談で使うシート・テンプレ</li></ul>
+      </div>
       <button class="btn ghost" id="replayBtn2">もう一回やる（問題は毎回変わる）</button>
     </div>
     <button class="btn ghost" id="shareBtn">友だち・同僚にも送る</button>
